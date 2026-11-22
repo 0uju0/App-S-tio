@@ -43,8 +43,8 @@ nav button{background:none;border:0;color:#BFAE98;font:600 12px Inter,sans-serif
 <div id="app"></div><nav id="nav" hidden></nav><div id="toast" role="status"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,getDoc,getDocs,increment,writeBatch,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {where,getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,getDoc,getDocs,increment,writeBatch,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDnFinb5lTgHk0MiZ1Lo6OorqdezcKo4Cc",
@@ -55,7 +55,9 @@ const firebaseConfig = {
   messagingSenderId: "55293786879",
   appId: "1:55293786879:web:32c4f9d453927074f5eaca"
 };
-const fb=initializeApp(firebaseConfig), auth=getAuth(fb), db=getFirestore(fb);
+const fb=initializeApp(firebaseConfig), auth=getAuth(fb);
+setPersistence(auth,browserLocalPersistence).catch(()=>{});
+let db;try{db=initializeFirestore(fb,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(e){db=getFirestore(fb)}
 
 /* Troque para true quando o app for lançado: a contagem de XP começa a valer. */
 const XP_ATIVO=false;
@@ -91,14 +93,130 @@ chave:`<path d="M18 46L42 16" stroke="#BDB4A6" stroke-width="7" stroke-linecap="
 milho:`<ellipse cx="30" cy="30" rx="10" ry="20" fill="#E3C98F" ${OL}/><path d="M18 52Q30 34 42 52" fill="#A9B58A" ${OL}/>`,
 saco:`<path d="M14 18h32l-2 34H16z" fill="#E9C58A" ${OL}/><rect x="19" y="28" width="22" height="12" fill="#fff" ${OL}/>`,
 adubo:`<path d="M14 18h32l-2 34H16z" fill="#E6E0D5" ${OL}/><rect x="19" y="28" width="22" height="12" fill="#A9B58A" ${OL}/>`,
-semente:`<ellipse cx="22" cy="34" rx="7" ry="11" fill="#8A5A2B" ${OL}/><ellipse cx="38" cy="34" rx="7" ry="11" fill="#E3C98F" ${OL}/><ellipse cx="30" cy="22" rx="6" ry="9" fill="#A9B58A" ${OL}/>`};
-const mini=(g,s=50)=>`<div class="b" style="width:${s+6}px;height:${s+6}px;background:#2B1810"><svg viewBox="0 0 60 60" width="${s}" height="${s}" aria-hidden="true"><ellipse cx="30" cy="55" rx="20" ry="4" fill="#C9A25B" opacity=".5"/>${GL[g]}</svg></div>`;
+semente:`<ellipse cx="22" cy="34" rx="7" ry="11" fill="#8A5A2B" ${OL}/><ellipse cx="38" cy="34" rx="7" ry="11" fill="#E3C98F" ${OL}/><ellipse cx="30" cy="22" rx="6" ry="9" fill="#A9B58A" ${OL}/>`,
+peixe:`<ellipse cx="28" cy="32" rx="20" ry="12" fill="#D9A06A" ${OL}/><polygon points="46,32 58,22 58,42" fill="#D9A06A" ${OL}/><circle cx="19" cy="29" r="3" fill="#2B1810"/>`};
+/* ---------- gerador automático de hologramas ---------- */
+const GEN={
+folha:c=>`<circle cx="30" cy="32" r="17" fill="${c}" ${OL}/><circle cx="30" cy="32" r="9" fill="#fff" opacity=".3"/><path d="M30 15v34M14 32h32" stroke="#2B1810" stroke-width="1.5" opacity=".35"/>`,
+fruto:c=>`<path d="M30 14v-6" stroke="#6B7F3F" stroke-width="4"/><circle cx="30" cy="32" r="16" fill="${c}" ${OL}/><path d="M22 18l8 5 8-5" fill="none" stroke="#6B7F3F" stroke-width="3"/>`,
+raiz:c=>`<polygon points="18,22 42,22 30,54" fill="${c}" ${OL}/><path d="M30 22l-7-12M30 22v-14M30 22l7-12" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/>`,
+espiga:c=>`<path d="M30 54V16" stroke="#6B7F3F" stroke-width="3"/><ellipse cx="22" cy="22" rx="5" ry="9" transform="rotate(-25 22 22)" fill="${c}" ${OL}/><ellipse cx="38" cy="22" rx="5" ry="9" transform="rotate(25 38 22)" fill="${c}" ${OL}/><ellipse cx="22" cy="38" rx="5" ry="9" transform="rotate(-25 22 38)" fill="${c}" ${OL}/><ellipse cx="38" cy="38" rx="5" ry="9" transform="rotate(25 38 38)" fill="${c}" ${OL}/>`,
+engrenagem:(c,l)=>`<circle cx="30" cy="32" r="20" fill="none" stroke="${c}" stroke-width="7" stroke-dasharray="5 4"/><circle cx="30" cy="32" r="14" fill="${c}" ${OL}/><text x="30" y="38" text-anchor="middle" font-size="16" font-weight="800" fill="#2B1810">${esc(l)}</text>`,
+sacoc:(c,l)=>`<path d="M14 18h32l-2 34H16z" fill="${c}" ${OL}/><rect x="19" y="28" width="22" height="14" fill="#fff" ${OL}/><text x="30" y="39" text-anchor="middle" font-size="12" font-weight="800" fill="#2B1810">${esc(l)}</text>`,
+cristal:(c,l)=>`<polygon points="30,8 50,20 50,42 30,54 10,42 10,20" fill="${c}" ${OL}/><text x="30" y="38" text-anchor="middle" font-size="20" font-weight="800" fill="#2B1810">${esc(l)}</text>`,
+pa:()=>`<path d="M30 8v30" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><path d="M20 36h20l-3 16H23z" fill="#BDB4A6" ${OL}/>`,
+enxada:()=>`<path d="M32 6L20 48" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><path d="M12 44h26l-4 10H12z" fill="#BDB4A6" ${OL}/>`,
+alicate:()=>`<path d="M22 8l8 20-8 24M38 8l-8 20 8 24" fill="none" stroke="#BDB4A6" stroke-width="7" stroke-linecap="round"/><circle cx="30" cy="28" r="4" fill="#E8A29A" ${OL}/>`,
+chavefenda:()=>`<rect x="24" y="26" width="13" height="26" rx="5" fill="#E8A29A" ${OL}/><rect x="29" y="6" width="4" height="22" fill="#BDB4A6" ${OL}/>`,
+trena:()=>`<rect x="12" y="18" width="30" height="26" rx="5" fill="#E3C98F" ${OL}/><rect x="40" y="36" width="14" height="5" fill="#BDB4A6" ${OL}/><circle cx="27" cy="31" r="6" fill="#fff" ${OL}/>`,
+regador:()=>`<path d="M16 24h24l-3 26H19z" fill="#8FB3C7" ${OL}/><path d="M40 30l14-10" stroke="#8FB3C7" stroke-width="5" stroke-linecap="round"/><path d="M18 24c0-10 20-10 20 0" fill="none" stroke="#2B1810" stroke-width="3"/>`,
+mangueira:()=>`<path d="M12 44c0-20 20-8 20-20s16-4 16 8" fill="none" stroke="#6B7F3F" stroke-width="7" stroke-linecap="round"/>`,
+carrinho:()=>`<path d="M10 22h34l-6 18H16z" fill="#E3C98F" ${OL}/><circle cx="46" cy="44" r="7" fill="#BDB4A6" ${OL}/><circle cx="46" cy="44" r="2.5" fill="#2B1810"/><path d="M6 16l6 6M44 22l10-8" stroke="#8A5A2B" stroke-width="4" stroke-linecap="round"/>`,
+galao:c=>`<rect x="16" y="16" width="26" height="36" rx="5" fill="${c}" ${OL}/><rect x="22" y="9" width="10" height="8" fill="#BDB4A6" ${OL}/>`,
+arvore:c=>`<rect x="27" y="34" width="6" height="18" fill="#8A5A2B" ${OL}/><circle cx="30" cy="24" r="16" fill="${c}" ${OL}/><circle cx="24" cy="21" r="4" fill="#fff" opacity=".25"/>`,
+flor:c=>`<path d="M30 54V30" stroke="#6B7F3F" stroke-width="4"/>`+[[30,12],[41,19],[37,31],[23,31],[19,19]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6.5" fill="${c}" ${OL}/>`).join('')+`<circle cx="30" cy="23" r="6" fill="#E3C98F" ${OL}/>`,
+cacho:c=>`<path d="M30 6v10" stroke="#6B7F3F" stroke-width="4"/>`+[[22,22],[30,22],[38,22],[26,31],[34,31],[30,40]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6.5" fill="${c}" ${OL}/>`).join(''),
+pimenta:c=>`<path d="M20 20c4 18 14 28 26 30-2-14-10-26-26-30z" fill="${c}" ${OL}/><path d="M20 20l-4-6" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/>`,
+abacaxi:()=>`<ellipse cx="30" cy="38" rx="12" ry="16" fill="#E3C98F" ${OL}/><path d="M30 22l-8-12M30 22v-14M30 22l8-12" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/><path d="M22 32l16 12M38 32L22 44" stroke="#2B1810" stroke-width="1.5" opacity=".4"/>`,
+ovo:()=>`<ellipse cx="30" cy="34" rx="13" ry="17" fill="#F3EEE4" ${OL}/><ellipse cx="25" cy="28" rx="3" ry="5" fill="#fff" opacity=".6"/>`,
+galinha:()=>`<path d="M12 28l8 6-6 6z" fill="#BDB4A6" ${OL}/><ellipse cx="28" cy="36" rx="16" ry="13" fill="#F3EEE4" ${OL}/><circle cx="42" cy="22" r="8" fill="#F3EEE4" ${OL}/><path d="M49 21l7 3-7 3z" fill="#D9A06A" ${OL}/><circle cx="40" cy="21" r="2" fill="#2B1810"/><path d="M38 14c2-5 6-5 8 0" fill="#D9503F" stroke="#2B1810" stroke-width="2"/><path d="M26 50v5M32 50v5" stroke="#D9A06A" stroke-width="3"/>`,
+vaca:()=>`<rect x="8" y="24" width="34" height="18" rx="6" fill="#F3EEE4" ${OL}/><rect x="38" y="18" width="16" height="16" rx="5" fill="#F3EEE4" ${OL}/><ellipse cx="46" cy="32" rx="7" ry="4" fill="#E8A29A" ${OL}/><circle cx="44" cy="25" r="1.8" fill="#2B1810"/><path d="M40 18l-3-5M52 18l3-5" stroke="#BDB4A6" stroke-width="3"/><ellipse cx="20" cy="31" rx="5" ry="4" fill="#8A5A2B"/><ellipse cx="32" cy="35" rx="4" ry="3" fill="#8A5A2B"/><path d="M14 42v10M36 42v10" stroke="#BDB4A6" stroke-width="4"/>`,
+porco:()=>`<ellipse cx="28" cy="34" rx="19" ry="13" fill="#E8A29A" ${OL}/><circle cx="46" cy="32" r="9" fill="#E8A29A" ${OL}/><ellipse cx="53" cy="34" rx="4" ry="3" fill="#D98A82" ${OL}/><path d="M42 24l2-7 5 6z" fill="#E8A29A" ${OL}/><circle cx="45" cy="29" r="1.8" fill="#2B1810"/><path d="M14 44v9M30 46v8" stroke="#D98A82" stroke-width="4"/><path d="M9 30c-5-2-4-8 0-6" fill="none" stroke="#D98A82" stroke-width="2.5"/>`,
+cavalo:()=>`<path d="M40 26l4-16 12 6-4 14z" fill="#D9A06A" ${OL}/><ellipse cx="26" cy="32" rx="17" ry="10" fill="#D9A06A" ${OL}/><path d="M43 12c-6 2-9 8-8 14" fill="none" stroke="#8A5A2B" stroke-width="3.5"/><circle cx="51" cy="16" r="1.8" fill="#2B1810"/><path d="M14 40v13M22 41v13M32 41v13M39 38v15" stroke="#8A5A2B" stroke-width="4"/><path d="M9 28c-5 4-4 10-2 14" fill="none" stroke="#8A5A2B" stroke-width="3.5"/>`,
+ovelha:()=>`<circle cx="22" cy="30" r="9" fill="#F3EEE4" ${OL}/><circle cx="32" cy="26" r="9" fill="#F3EEE4" ${OL}/><circle cx="38" cy="34" r="9" fill="#F3EEE4" ${OL}/><circle cx="24" cy="38" r="9" fill="#F3EEE4" ${OL}/><ellipse cx="47" cy="28" rx="6" ry="7" fill="#8A5A2B" ${OL}/><circle cx="48" cy="26" r="1.5" fill="#fff"/><path d="M20 46v8M36 46v8" stroke="#8A5A2B" stroke-width="4"/>`,
+colmeia:()=>`<rect x="12" y="40" width="36" height="10" rx="2" fill="#E3C98F" ${OL}/><rect x="14" y="30" width="32" height="10" rx="2" fill="#D9A06A" ${OL}/><rect x="16" y="20" width="28" height="10" rx="2" fill="#E3C98F" ${OL}/><path d="M12 20l18-12 18 12z" fill="#8A5A2B" ${OL}/><rect x="26" y="42" width="8" height="4" fill="#2B1810"/>`,
+balde:()=>`<path d="M16 22h28l-3 28H19z" fill="#BDB4A6" ${OL}/><path d="M16 22c0-12 28-12 28 0" fill="none" stroke="#2B1810" stroke-width="3"/><path d="M19 32h22" stroke="#2B1810" stroke-width="1.5" opacity=".4"/>`,
+trator:()=>`<rect x="28" y="26" width="24" height="14" rx="3" fill="#D9773F" ${OL}/><rect x="12" y="12" width="18" height="20" rx="3" fill="#D9773F" ${OL}/><rect x="15" y="15" width="12" height="9" fill="#C9E0EC" ${OL}/><circle cx="20" cy="42" r="11" fill="#6B4A2E" ${OL}/><circle cx="20" cy="42" r="4" fill="#E3C98F"/><circle cx="46" cy="46" r="7" fill="#6B4A2E" ${OL}/><circle cx="46" cy="46" r="3" fill="#E3C98F"/>`,
+motosserra:()=>`<rect x="8" y="24" width="26" height="18" rx="5" fill="#D9773F" ${OL}/><path d="M16 24c0-8 12-8 12 0" fill="none" stroke="#2B1810" stroke-width="3"/><rect x="34" y="30" width="22" height="7" rx="3" fill="#BDB4A6" ${OL}/><path d="M38 33h14" stroke="#2B1810" stroke-width="2" stroke-dasharray="2 2"/>`,
+rocadeira:()=>`<path d="M12 50L40 20" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><circle cx="44" cy="16" r="9" fill="#BDB4A6" ${OL}/><path d="M38 16h12" stroke="#2B1810" stroke-width="2"/><rect x="6" y="46" width="14" height="9" rx="3" fill="#D9773F" ${OL}/>`,
+bomba:()=>`<circle cx="26" cy="34" r="16" fill="#8FB3C7" ${OL}/><rect x="38" y="26" width="16" height="10" fill="#BDB4A6" ${OL}/><circle cx="26" cy="34" r="5" fill="#fff" ${OL}/><rect x="14" y="48" width="24" height="6" rx="2" fill="#2B1810"/>`,
+caixa:()=>`<rect x="10" y="22" width="40" height="26" rx="4" fill="#D9773F" ${OL}/><path d="M22 22v-6h16v6" fill="none" stroke="#2B1810" stroke-width="3"/><rect x="26" y="32" width="8" height="6" fill="#E3C98F" ${OL}/>`,
+escada:()=>`<path d="M20 6v48M40 6v48" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><path d="M20 16h20M20 28h20M20 40h20" stroke="#BDB4A6" stroke-width="4"/>`,
+prego:()=>`<rect x="22" y="8" width="16" height="6" rx="2" fill="#BDB4A6" ${OL}/><path d="M30 14v38" stroke="#BDB4A6" stroke-width="6"/><path d="M26 22l8 3M26 30l8 3M26 38l8 3" stroke="#2B1810" stroke-width="2"/>`,
+lanterna:()=>`<rect x="22" y="24" width="16" height="26" rx="4" fill="#E3C98F" ${OL}/><path d="M20 14h20l-4 10H24z" fill="#BDB4A6" ${OL}/><path d="M30 5v4M18 9l3 3M42 9l-3 3" stroke="#E3C98F" stroke-width="3"/>`,
+barril:c=>`<ellipse cx="30" cy="16" rx="14" ry="5" fill="#BDB4A6" ${OL}/><path d="M16 16v32c0 6 28 6 28 0V16" fill="${c}" ${OL}/><path d="M16 28c0 6 28 6 28 0M16 38c0 6 28 6 28 0" fill="none" stroke="#2B1810" stroke-width="2"/>`,
+seringa:()=>`<rect x="16" y="26" width="26" height="10" rx="3" fill="#F3EEE4" ${OL}/><rect x="42" y="29" width="12" height="4" fill="#BDB4A6" ${OL}/><rect x="8" y="22" width="4" height="18" fill="#BDB4A6" ${OL}/><path d="M12 31h4" stroke="#2B1810" stroke-width="3"/><rect x="22" y="28" width="10" height="6" fill="#E8A29A"/>`,
+aerador:()=>`<rect x="14" y="30" width="32" height="16" rx="4" fill="#BDB4A6" ${OL}/><circle cx="22" cy="20" r="5" fill="#C9E0EC" ${OL}/><circle cx="34" cy="12" r="4" fill="#C9E0EC" ${OL}/><circle cx="40" cy="22" r="3" fill="#C9E0EC" ${OL}/>`,
+termometro:()=>`<rect x="26" y="8" width="8" height="34" rx="4" fill="#fff" ${OL}/><circle cx="30" cy="46" r="8" fill="#D9503F" ${OL}/><rect x="29" y="22" width="2" height="22" fill="#D9503F"/>`,
+rede:()=>`<path d="M10 14h40M16 24h28M22 34h16M20 14l6 24M30 14v28M40 14l-6 24" stroke="#8FB3C7" stroke-width="2.5" fill="none"/><path d="M10 14c0 30 40 30 40 0" fill="none" stroke="#2B1810" stroke-width="2.5"/><path d="M30 44v10" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/>`,
+tanque:()=>`<path d="M10 24h40v20c0 6-40 6-40 0z" fill="#8FB3C7" ${OL}/><ellipse cx="30" cy="24" rx="20" ry="6" fill="#C9E0EC" ${OL}/>`};
+const KW=[
+[/galinha|frango|pinto|poedeira|galo|codorna|pato|marreco|peru|galinheiro/,'galinha'],[/\bovo|ovos/,'ovo'],
+[/vaca|boi\b|bezerro|gado|novilha|touro|bovino/,'vaca'],[/porco|suino|leitao|leitoa/,'porco'],[/cavalo|egua|potro|burro|mula|jumento/,'cavalo'],
+[/cabra|bode|ovelha|carneiro|caprino|ovino/,'ovelha'],[/abelha|colmeia|apicultura/,'colmeia'],[/leite|ordenha|balde/,'balde'],
+[/trator|microtrator|colheitadeira|ceifadeira|plantadeira/,'trator'],[/motosserra|motoserra/,'motosserra'],[/rocadeira|rocadora|trimmer|aparador/,'rocadeira'],
+[/bomba|motobomba|pressurizador/,'bomba'],[/caixa de ferramenta|maleta/,'caixa'],[/escada/,'escada'],
+[/prego|parafuso|porca|arruela|arame|grampo|tela\b|cerca|dobradica|cadeado/,'prego'],[/lanterna|lampada|luminaria|holofote|refletor|farol/,'lanterna'],
+[/barril|tonel|tambor|caixa d.?agua|cisterna/,'barril','#8FB3C7'],[/vacina|remedio|medicamento|vermifugo|antibiotico|seringa|vitamina/,'seringa'],
+[/aerador|aeracao/,'aerador'],[/termometro|sonda|sensor|medidor|phmetro|oximetro/,'termometro'],[/\brede\b|tarrafa|peneira|puca|covo/,'rede'],[/tanque|viveiro|lagoa|represa|lago\b/,'tanque'],
+[/sal mineral|mineral|suplemento|nucleo|silagem|feno|fardo/,'saco','#E9C58A'],
+[/cafe|cafeeiro|cacau|eucalipto|pinus|mogno|arvore|ipe\b|bambu|coco|palmeira|acai|seringueira|teca/,'arvore','#A9B58A'],
+[/flor|rosa\b|girassol|orquidea|margarida|jardim|ornamental|lirio|hibisco|violeta/,'flor','#E8A29A'],
+[/uva|jabuticaba/,'cacho','#6B4A7A'],[/banana/,'cacho','#E3C98F'],[/pimenta|malagueta|biquinho|jalapeno/,'pimenta','#D9503F'],[/abacaxi/,'abacaxi'],
+[/melancia|melao/,'fruto','#8FAA6A'],[/limao|lima\b/,'fruto','#C9D4A8'],
+[/tomate/,'tomate'],[/cenoura/,'cenoura'],[/alface/,'alface'],[/milho/,'milho'],
+[/rucula|agriao|espinafre|couve|repolho|acelga|chicoria|cheiro|salsa|cebolinha|hortela|manjeric|coentro|erva|capim/,'folha','#A9B58A'],
+[/beterraba|rabanete/,'raiz','#B04A63'],[/mandioca|aipim|macaxeira|batata|inhame|gengibre|acafrao/,'raiz','#C9A97A'],[/cebola|alho/,'raiz','#E6D3E8'],
+[/pimenta|pimentao|morango|acerola|goiaba|cereja|jabuticaba|amora/,'fruto','#D9503F'],[/abobora|jerimum|laranja|mexerica|limao|manga|mamao|caqui/,'fruto','#E69A3A'],
+[/berinjela|uva|figo/,'fruto','#6B4A7A'],[/banana|maracuja|abacaxi|pepino|chuchu|quiabo|jilo/,'fruto','#C9D4A8'],
+[/feijao|soja|arroz|trigo|aveia|sorgo|cana/,'espiga','#D9BB7A'],
+[/martelo|marreta|malho/,'martelo'],[/furadeira|parafusadeira/,'furadeira'],[/serra|serrote|tico|esmerilhadeira|lixadeira|politriz|disco/,'serra'],
+[/chave de fenda|fenda|philips/,'chavefenda'],[/chave/,'chave'],[/alicate/,'alicate'],[/cavadeira|\bpa\b/,'pa'],[/enxada|enxadao|picareta|foice|facao|machado|podao|tesoura|rastelo/,'enxada'],
+[/trena|metro|nivel|esquadro/,'trena'],[/regador|balde/,'regador'],[/mangueira|cano|tubo/,'mangueira'],[/carrinho|carreta/,'carrinho'],
+[/racao|farelo|fuba|farinha|sal\b/,'saco'],[/adubo|calcario|fertiliz|npk|ureia|esterco/,'adubo'],[/semente|muda/,'semente'],
+[/gasolina|oleo|diesel|combust|graxa|veneno|defensivo|herbicida|inseticida|fungicida/,'galao','#D9503F'],
+[/tilapia|tambaqui|peixe|alevino|pintado|carpa|tambacu|pacu/,'peixe']];
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+const slug=s=>norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'item';
+const hashN=s=>{let h=0;for(const ch of s)h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)};
+function calc(nome,kind){
+  const n=norm(nome),l=(String(nome).trim()[0]||'?').toUpperCase();
+  for(const [re,g,cor] of KW)if(re.test(n))return {g,cor:cor||'#C9A25B',l};
+  const cores=['#C9A25B','#A9B58A','#E8A29A','#8FB3C7','#D9A06A','#BDB4A6','#C9D4A8','#E3C98F'];
+  return {g:kind==='planta'?'folha':kind==='ferramenta'?'engrenagem':kind==='insumo'?'sacoc':'cristal',cor:cores[hashN(n)%cores.length],l};
+}
+let holos={};
+const H=(nome,kind)=>holos[slug(nome)]||calc(nome,kind);
+async function ensureHolo(nome,kind){const k=slug(nome);if(holos[k])return;const h=calc(nome,kind);holos[k]=h;await setDoc(doc(db,'sitios',sid,'hologramas',k),{...h,nome,criadoEm:Date.now()})}
+const glyph=h=>{const x=typeof h==='string'?{g:h}:h;return GL[x.g]||(GEN[x.g]||GEN.cristal)(x.cor||'#C9A25B',x.l||'?')};
+const mini=(h,s=50)=>`<div class="b" style="width:${s+6}px;height:${s+6}px;background:#2B1810"><svg viewBox="0 0 60 60" width="${s}" height="${s}" aria-hidden="true"><ellipse cx="30" cy="55" rx="20" ry="4" fill="#C9A25B" opacity=".5"/>${glyph(h)}</svg></div>`;
 const PLOTS=`<polygon points="150,60 188,80 150,100 112,80" fill="#8A5A2B" stroke="#2B1810" stroke-width="3"/><circle cx="150" cy="76" r="7" fill="#E8A29A" stroke="#2B1810" stroke-width="2"/><circle cx="133" cy="82" r="6" fill="#D9773F" stroke="#2B1810" stroke-width="2"/><circle cx="167" cy="82" r="6" fill="#E3C98F" stroke="#2B1810" stroke-width="2"/><path d="M150 76v-14M133 82v-12M167 82v-12" stroke="#6B7F3F" stroke-width="4"/>`;
 const island=(inner,w)=>`<div class="h"><svg viewBox="0 0 300 200" width="${w}" height="${w*2/3}" role="img" aria-label="Holograma flutuante"><defs><linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#C9A25B" stop-opacity=".55"/><stop offset="1" stop-color="#C9A25B" stop-opacity="0"/></linearGradient></defs><polygon points="70,186 230,186 200,100 100,100" fill="url(#bm)"/><ellipse cx="150" cy="186" rx="90" ry="12" fill="#C9A25B" opacity=".4" stroke="#B8893B" stroke-width="2"/><g class="fl"><polygon points="76,98 224,98 150,164" fill="#4A2E20" stroke="#2B1810" stroke-width="3" stroke-linejoin="round"/><polygon points="150,50 232,92 150,134 68,92" fill="#F3EEE4" stroke="#2B1810" stroke-width="3" stroke-linejoin="round"/>${inner}</g></svg></div>`;
-const big=g=>`<g transform="translate(110,30) scale(1.3)">${GL[g]}</g>`;
+const big=h=>`<g transform="translate(110,30) scale(1.3)">${glyph(h)}</g>`;
+
+/* ---------- dicas da tela de abertura ---------- */
+const DICAS=[
+'Regue cedo ou no fim da tarde: a água evapora menos e as plantas aproveitam mais.',
+'Cobertura morta (palha, folhas secas) ajuda o solo a reter umidade e segura o mato.',
+'Alternar o que se planta em cada canteiro ajuda a reduzir pragas e doenças que se repetem.',
+'Anote datas de plantio, adubação e colheita: o histórico ajuda a ajustar o próximo ciclo.',
+'Uma análise de solo antes de adubar evita desperdício. Procure a assistência técnica rural da sua região (no ES, o Incaper).',
+'Ferramentas limpas e secas duram mais. Um pouco de óleo nas partes de metal ajuda contra ferrugem.',
+'Guarde sementes e grãos em local seco, fresco e ventilado, longe de umidade e de animais.',
+'Confira o estoque e a validade do paiol uma vez por semana.',
+'Nos tanques de peixe, o oxigênio costuma ser mais baixo de madrugada. Vale medir cedo.',
+'Tenha aerador reserva e uma fonte de energia alternativa para a piscicultura.',
+'Não ofereça mais ração do que os peixes consomem: a sobra piora a qualidade da água.',
+'Faça backup dos seus dados com frequência: o botão Exportar fica no seu perfil.',
+'Registre os empréstimos de ferramentas: evita perder tempo procurando depois.',
+'Olhe as plantas todos os dias: mudança na cor das folhas costuma ser o primeiro sinal de problema.',
+'Compostagem transforma restos da horta em adubo e reduz custos.',
+'Revise cercas, porteiras e cadeados com regularidade, principalmente antes da época das chuvas.',
+'Água parada em baldes, pneus e calhas atrai mosquitos. Mantenha tudo limpo e virado.',
+'Ao usar defensivos agrícolas, siga a bula, use equipamento de proteção e peça orientação técnica.',
+'Deixe os serviços mais pesados para as horas mais frescas do dia.',
+'Dê uma volta pelo sítio ao fim do dia: vazamentos e portões abertos aparecem rápido.',
+'Mantenha à mão os telefones de emergência: veterinário, técnico agrícola e eletricista.',
+'Etiquete o que guardar no paiol com a data de entrada: o mais antigo sai primeiro.',
+'Plantas de ciclo curto, como alface e rabanete, dão colheita rápida e boas lições de manejo.',
+'Observe o caminho da água na chuva: ele mostra onde o solo pode erodir.'];
+const DICA=DICAS[Math.floor(Math.random()*DICAS.length)];
+let splashOk=false;setTimeout(()=>{splashOk=true;render()},1600);
+const splash=m=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;min-height:84dvh">${island(PLOTS,250)}<div style="text-align:center"><h1>Sítio Bom Jesus</h1><div class="m">${esc(m)}</div></div><div class="c"><h2>Dica do sítio</h2><div class="m" style="color:#2B1810">${esc(DICA)}</div></div></div>`;
 
 /* ---------- estado ---------- */
-let user=null,sid=null,sitio=null,cants=[],fers=[],itens=[],movs=[],view='home',selId=null,cat='todos',q='',unsubs=[],erroDb='';
+let props=[],user=null,sid=null,sitio=null,cants=[],fers=[],itens=[],movs=[],view='home',selId=null,cat='todos',q='',unsubs=[],erroDb='';
+let authReady=false;
 const col=n=>collection(db,'sitios',sid,n),dref=(n,id)=>doc(db,'sitios',sid,n,id);
 
 /* ---------- cálculos ---------- */
@@ -129,12 +247,12 @@ function vLogin(){return `<div style="height:20px"></div>${island(PLOTS,320)}<di
 function vHome(){
   const nome=esc((user.displayName||'').split(' ')[0]||'Bem-vindo'),A=avisos();
   const av=A.length?A.map(a=>{
-    if(a.k==='t')return `<div class="c"><div class="r">${mini(PRE[a.c.tipo]?.g||'broto',44)}<div class="f1"><h2>${a.v} ${esc(a.c.nome)}</h2><div class="m">${esc(a.c.planta)} · ${quando(a.o)}</div></div><button class="btn sm" data-act="feito" data-id="${a.c.id}" data-t="${a.t}" aria-label="Marcar como feito">Feito</button></div></div>`;
-    const x=a.k==='f'?a.f:a.i,g=a.k==='f'?(FER[x.tipo]?.g||'chave'):CAT[x.cat]?.g||'saco';
+    if(a.k==='t')return `<div class="c"><div class="r">${mini(H(a.c.planta,'planta'),44)}<div class="f1"><h2>${a.v} ${esc(a.c.nome)}</h2><div class="m">${esc(a.c.planta)} · ${quando(a.o)}</div></div><button class="btn sm" data-act="feito" data-id="${a.c.id}" data-t="${a.t}" aria-label="Marcar como feito">Feito</button></div></div>`;
+    const x=a.k==='f'?a.f:a.i,g=H(x.nome,a.k==='f'?'ferramenta':'insumo');
     const tit=a.k==='v'?'Vence: '+esc(x.nome):'Repor '+esc(x.nome);
     const sub=a.k==='v'?(diasV(x)<0?'vencido há '+(-diasV(x))+' d':'vence '+quando(diasV(x))):`${x.qtd} ${esc(x.unidade||'un')} · mínimo ${x.min}`;
     return `<div class="c"><div class="r">${mini(g,44)}<div class="f1"><h2>${tit}</h2><div class="m">${sub}</div></div><button class="btn sm" data-act="${a.k==='f'?'ofabrir':'paabrir'}" data-id="${x.id}">Ver</button></div></div>`}).join(''):`<div class="c"><div class="m">Nenhum aviso agora. Tudo em dia.</div></div>`;
-  return `<div class="r"><div class="f1"><div class="m">Olá</div><h1>${nome}</h1></div><button class="link" data-act="logout">Sair</button></div>
+  return `<div class="r"><div class="f1"><div class="m">Olá</div><h1>${nome}</h1><button class="link" data-go="props" style="text-align:left">${esc(sitio?.nome||'Minhas propriedades')} ▾</button></div><button data-go="perfil" aria-label="Meu perfil" style="background:none;border:0;padding:0;cursor:pointer">${avatar(48)}</button></div>
 <div class="c"><div class="r"><h2 class="f1">${XP_ATIVO?'Sítio em crescimento':'Sítio em preparação'}</h2><span class="t w">${XP_ATIVO?(sitio?.xp||0):0} XP</span></div><div class="bar"><i style="width:${XP_ATIVO?((sitio?.xp||0)%1000)/10:0}%"></i></div>${XP_ATIVO?'':'<div class="m">A contagem de XP começa quando o app for lançado.</div>'}</div>
 <div><h2>Avisos de hoje</h2><div class="m">Ao resolver, o aviso some daqui</div></div>${av}
 <div class="g"><button class="big" data-go="hortas">Hortas<span>${cants.length} canteiro(s)</span></button><button class="big" data-go="oficina">Ferramentaria<span>${fers.length} item(ns)</span></button><button class="big" data-go="paiol">Paiol<span>${itens.length} item(ns)</span></button><button class="big off" data-act="soon">Piscicultura<span>em breve</span></button></div>
@@ -143,25 +261,25 @@ function vHome(){
 /* Hortas */
 function vHortas(){
   const rows=cants.map(c=>{const dr=dias(c,'r'),dc=dias(c,'c'),d=Math.min(dr,dc),t=dr<=dc?'Regar':'Capinar';
-    return rowH(PRE[c.tipo]?.g||'broto',`${esc(c.nome)} · ${esc(c.planta)}`,`Plantio ${fmt(c.plantio)}`,d<=0?t:'Em '+d+' d',d<0?'p':d===0?'w':'',`data-act="abrir" data-id="${c.id}"`)}).join('');
+    return rowH(H(c.planta,'planta'),`${esc(c.nome)} · ${esc(c.planta)}`,`Plantio ${fmt(c.plantio)}`,d<=0?t:'Em '+d+' d',d<0?'p':d===0?'w':'',`data-act="abrir" data-id="${c.id}"`)}).join('');
   return `<h1>Plantações e Hortas</h1>${island(PLOTS,220)}${rows||'<div class="c"><div class="m">Nenhum canteiro ainda. Cadastre o primeiro.</div></div>'}<button class="btn" data-act="novo">+ Novo canteiro</button>`}
-function vNovo(){return `${back('hortas')}<h1>Novo canteiro</h1>${field('nome','Nome do canteiro',inp('nome','Canteiro '+(cants.length+1)))}${field('planta','Planta',selH('planta',Object.entries(PRE).map(([k,v])=>[k,v.n]),'tomate'))}<div id="nomeOutra" hidden>${field('outra','Nome da planta',inp('outra','','placeholder="Ex.: couve"'))}</div>${field('plantio','Data de plantio',inp('plantio',hojeISO(),'type="date"'))}<div class="g">${field('rd','Regar a cada (dias)',inp('rd',PRE.tomate.r,'type="number" min="1"'))}${field('cd','Capinar a cada (dias)',inp('cd',PRE.tomate.c,'type="number" min="1"'))}</div><div class="m">Os intervalos são valores iniciais de exemplo. Ajuste conforme seu clima e solo.</div><button class="btn" data-act="salvar">Salvar canteiro</button>`}
+function vNovo(){return `${back('hortas')}<h1>Novo canteiro</h1>${field('nome','Nome do canteiro',inp('nome','Canteiro '+(cants.length+1)))}${field('planta','Planta',inp('planta','','list="plantas" placeholder="Ex.: tomate, couve, mandioca" autocomplete="off"')+`<datalist id="plantas">${Object.values(PRE).filter(p=>p.n!=='Outra planta').map(p=>`<option value="${p.n}">`).join('')}</datalist>`)}<div id="prev" class="r"></div>${field('plantio','Data de plantio',inp('plantio',hojeISO(),'type="date"'))}<div class="g">${field('rd','Regar a cada (dias)',inp('rd',3,'type="number" min="1"'))}${field('cd','Capinar a cada (dias)',inp('cd',15,'type="number" min="1"'))}</div><div class="m">Os intervalos são valores iniciais de exemplo. Ajuste conforme seu clima e solo.</div><button class="btn" data-act="salvar">Salvar canteiro</button>`}
 function vDetalhe(){
   const c=cants.find(x=>x.id===selId);if(!c)return vHortas();
   const dr=dias(c,'r'),dc=dias(c,'c');
-  return `${back('hortas')}<div class="r"><h1 class="f1">${esc(c.planta)}</h1><span class="t">${esc(c.nome)}</span></div>${island(big(PRE[c.tipo]?.g||'broto'),210)}
+  return `${back('hortas')}<div class="r"><h1 class="f1">${esc(c.planta)}</h1><span class="t">${esc(c.nome)}</span></div>${island(big(H(c.planta,'planta')),210)}
 <div class="c"><h2>Regar</h2><div class="m">Última: ${c.ultimaRega?fmt(c.ultimaRega):'ainda não'} · a cada ${c.regaDias} d</div><span class="t ${dr<0?'p':dr===0?'w':''}" style="align-self:flex-start">Próxima: ${quando(dr)} (${fmt(nextT(c,'r'))})</span><button class="btn" data-act="reguei" data-id="${c.id}">Reguei${xpTxt(20)}</button></div>
 <div class="c"><h2>Capinar</h2><div class="m">Última: ${c.ultimaCapina?fmt(c.ultimaCapina):'ainda não'} · a cada ${c.capinaDias} d</div><span class="t ${dc<0?'p':dc===0?'w':''}" style="align-self:flex-start">Próxima: ${quando(dc)} (${fmt(nextT(c,'c'))})</span><button class="btn" data-act="capinei" data-id="${c.id}">Capinei${xpTxt(30)}</button></div>
 <div class="m" style="text-align:center">Plantado em ${fmt(c.plantio)}</div><button class="btn w2" data-act="excluir" data-id="${c.id}">Excluir canteiro</button>`}
 
 /* Oficina */
 const filtraF=()=>fers.filter(f=>!q||(f.nome+' '+(f.local||'')).toLowerCase().includes(q.toLowerCase())).sort((a,b)=>a.nome.localeCompare(b.nome));
-const listaOf=()=>filtraF().map(f=>rowH(FER[f.tipo]?.g||'chave',esc(f.nome),`${esc(f.local||'sem local')} · qtd ${f.qtd}${f.emprestada?' · com '+esc(f.emprestada.com):''}`,f.emprestada?'Emprestada':EST[f.estado],f.emprestada?'w':EC[f.estado],`data-act="ofabrir" data-id="${f.id}"`)).join('')||'<div class="c"><div class="m">Nenhuma ferramenta encontrada.</div></div>';
+const listaOf=()=>filtraF().map(f=>rowH(H(f.nome,'ferramenta'),esc(f.nome),`${esc(f.local||'sem local')} · qtd ${f.qtd}${f.emprestada?' · com '+esc(f.emprestada.com):''}`,f.emprestada?'Emprestada':EST[f.estado],f.emprestada?'w':EC[f.estado],`data-act="ofabrir" data-id="${f.id}"`)).join('')||'<div class="c"><div class="m">Nenhuma ferramenta encontrada.</div></div>';
 function vOficina(){return `<h1>Ferramentaria e Oficina</h1>${island(big('martelo'),190)}<input class="in" id="busca" placeholder="Buscar ferramenta" value="${esc(q)}"><div id="lista" style="display:flex;flex-direction:column;gap:12px">${listaOf()}</div><button class="btn" data-act="ofnovo">+ Nova ferramenta</button>`}
-function vOfNovo(){return `${back('oficina')}<h1>Nova ferramenta</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Furadeira de impacto"'))}${field('tipo','Tipo',selH('tipo',Object.entries(FER).map(([k,v])=>[k,v.n]),'martelo'))}<div class="g">${field('qtd','Quantidade',inp('qtd',1,'type="number" min="0"'))}${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0"'))}</div>${field('local','Local',inp('local','','placeholder="Ex.: Prateleira B"'))}${field('estado','Estado',selH('estado',Object.entries(EST),'bom'))}<button class="btn" data-act="ofsalvar">Salvar ferramenta</button>`}
+function vOfNovo(){return `${back('oficina')}<h1>Nova ferramenta</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Furadeira de impacto"'))}<div id="prev" class="r"></div><div class="g">${field('qtd','Quantidade',inp('qtd',1,'type="number" min="0"'))}${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0"'))}</div>${field('local','Local',inp('local','','placeholder="Ex.: Prateleira B"'))}${field('estado','Estado',selH('estado',Object.entries(EST),'bom'))}<button class="btn" data-act="ofsalvar">Salvar ferramenta</button>`}
 function vOfDet(){
   const f=fers.find(x=>x.id===selId);if(!f)return vOficina();
-  return `${back('oficina')}<div class="r"><h1 class="f1">${esc(f.nome)}</h1><span class="t ${EC[f.estado]}">${EST[f.estado]}</span></div>${island(big(FER[f.tipo]?.g||'chave'),190)}
+  return `${back('oficina')}<div class="r"><h1 class="f1">${esc(f.nome)}</h1><span class="t ${EC[f.estado]}">${EST[f.estado]}</span></div>${island(big(H(f.nome,'ferramenta')),190)}
 <div class="c"><h2>Quantidade</h2><div class="r"><button class="btn sm" data-act="qmenos" data-id="${f.id}" aria-label="Diminuir">−</button><div class="f1" style="text-align:center;font-size:22px;font-weight:800">${f.qtd}</div><button class="btn sm" data-act="qmais" data-id="${f.id}" aria-label="Aumentar">+</button></div><div class="m">Local: ${esc(f.local||'não informado')}${f.min?' · avisar abaixo de '+f.min:''}</div></div>
 ${field('estado','Estado',selH('estado',Object.entries(EST),f.estado))}
 <div class="c"><h2>Empréstimo</h2>${f.emprestada?`<div class="m">Com ${esc(f.emprestada.com)} desde ${fmt(f.emprestada.desde)}</div><button class="btn" data-act="devolveu" data-id="${f.id}">Foi devolvida</button>`:`<div class="m">Disponível na oficina</div><button class="btn" data-act="emprestar" data-id="${f.id}">Emprestar</button>`}</div>
@@ -172,25 +290,43 @@ const filtraP=()=>itens.filter(i=>cat==='todos'||i.cat===cat).sort((a,b)=>a.nome
 function vPaiol(){
   const h=d0(Date.now()),ent=movs.filter(m=>m.tipo==='entrada'&&d0(m.em)===h).length,sai=movs.filter(m=>m.tipo==='saida'&&d0(m.em)===h).length,venc=itens.filter(i=>i.validade&&diasV(i)<=30).length;
   const rows=filtraP().map(i=>{const dv=i.validade?diasV(i):null;
-    return rowH(CAT[i.cat]?.g||'saco',esc(i.nome),i.validade?`Validade ${fmt(i.validade)}${dv<=30?' · '+(dv<0?'vencido':quando(dv)):''}`:'Sem validade',baixo(i)?'Baixo · '+i.qtd+' '+esc(i.unidade):i.qtd+' '+esc(i.unidade),baixo(i)||(dv!==null&&dv<0)?'p':'',`data-act="paabrir" data-id="${i.id}"`)}).join('');
-  return `<h1>Paiol</h1>${island(big('saco'),170)}<div class="r">${box(ent,'Entradas hoje')}${box(sai,'Saídas hoje')}${box(venc,'Vencem em 30 d')}</div>
+    return rowH(H(i.nome,'insumo'),esc(i.nome),i.validade?`Validade ${fmt(i.validade)}${dv<=30?' · '+(dv<0?'vencido':quando(dv)):''}`:'Sem validade',baixo(i)?'Baixo · '+i.qtd+' '+esc(i.unidade):i.qtd+' '+esc(i.unidade),baixo(i)||(dv!==null&&dv<0)?'p':'',`data-act="paabrir" data-id="${i.id}"`)}).join('');
+  return `<h1>Paiol</h1>${island(big('saco'),170)}<div class="r">${box(ent,'Reposições hoje')}${box(sai,'Saídas hoje')}${box(venc,'Vencem em 30 d')}</div>
 <div class="chips">${[['todos','Todos'],...Object.entries(CAT).map(([k,v])=>[k,v.n])].map(([k,l])=>`<button class="chip ${cat===k?'on':''}" data-act="cat" data-id="${k}">${l}</button>`).join('')}</div>${rows||'<div class="c"><div class="m">Nenhum item nesta categoria.</div></div>'}<button class="btn" data-act="panovo">+ Novo item</button>`}
-function vPaNovo(){return `${back('paiol')}<h1>Novo item do paiol</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Ração tilápia"'))}${field('cat','Categoria',selH('cat',Object.entries(CAT).map(([k,v])=>[k,v.n]),'grao'))}<div class="g">${field('unidade','Unidade',inp('unidade','kg'))}${field('qtd','Quantidade inicial',inp('qtd',0,'type="number" min="0" step="any"'))}</div><div class="g">${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0" step="any"'))}${field('validade','Validade (opcional)',inp('validade','','type="date"'))}</div><button class="btn" data-act="pasalvar">Salvar item</button>`}
+function vPaNovo(){return `${back('paiol')}<h1>Novo item do paiol</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Ração tilápia"'))}<div id="prev" class="r"></div>${field('cat','Categoria',selH('cat',Object.entries(CAT).map(([k,v])=>[k,v.n]),'grao'))}<div class="g">${field('unidade','Unidade',inp('unidade','kg'))}${field('qtd','Quantidade inicial',inp('qtd',0,'type="number" min="0" step="any"'))}</div><div class="g">${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0" step="any"'))}${field('validade','Validade (opcional)',inp('validade','','type="date"'))}</div><button class="btn" data-act="pasalvar">Salvar item</button>`}
 function vPaDet(){
   const i=itens.find(x=>x.id===selId);if(!i)return vPaiol();
-  const hist=movs.filter(m=>m.itemId===i.id).slice(0,6).map(m=>`<div class="m">${fmt(m.em)} · ${m.tipo==='entrada'?'entrada':'saída'} ${m.qtd} ${esc(m.unidade)}${m.destino?' · '+esc(m.destino):''}</div>`).join('')||'<div class="m">Sem movimentos ainda.</div>';
-  return `${back('paiol')}<div class="r"><h1 class="f1">${esc(i.nome)}</h1><span class="t ${baixo(i)?'p':''}">${i.qtd} ${esc(i.unidade)}</span></div>${island(big(CAT[i.cat]?.g||'saco'),170)}
+  const hist=movs.filter(m=>m.itemId===i.id).slice(0,6).map(m=>`<div class="m">${fmt(m.em)} · ${m.tipo==='entrada'?'reposição':'saída'} ${m.qtd} ${esc(m.unidade)}${m.destino?' · '+esc(m.destino):''}</div>`).join('')||'<div class="m">Sem movimentos ainda.</div>';
+  return `${back('paiol')}<div class="r"><h1 class="f1">${esc(i.nome)}</h1><span class="t ${baixo(i)?'p':''}">${i.qtd} ${esc(i.unidade)}</span></div>${island(big(H(i.nome,'insumo')),170)}
 <div class="c"><div class="m">${CAT[i.cat]?.n||'Outros'}${i.min?' · avisar abaixo de '+i.min+' '+esc(i.unidade):''}${i.validade?' · validade '+fmt(i.validade):''}</div></div>
-<div class="c"><h2>Registrar movimento</h2><div class="g">${field('mq','Quantidade',inp('mq','','type="number" min="0" step="any" placeholder="0"'))}${field('md','Destino ou origem',selH('md',DEST.map(d=>[d,d]),'Tanque 1'))}</div><div class="g"><button class="btn" data-act="entrada" data-id="${i.id}">+ Entrada</button><button class="btn w2" data-act="saida" data-id="${i.id}">− Saída</button></div></div>
+<div class="c"><h2>Repor estoque</h2><div class="m">A reposição entra direto neste item.</div><div class="r">${inp('rq','','type="number" min="0" step="any" placeholder="Quantidade"')}<button class="btn" data-act="entrada" data-id="${i.id}">+ Repor</button></div></div>
+<div class="c"><h2>Dar saída</h2><div class="g">${inp('sq','','type="number" min="0" step="any" placeholder="Quantidade"')}${selH('sd',DEST.map(d=>[d,d]),'Tanque 1')}</div><button class="btn w2" data-act="saida" data-id="${i.id}">− Registrar saída</button></div>
 <div class="c"><h2>Histórico</h2>${hist}</div><button class="btn w2" data-act="paexcluir" data-id="${i.id}">Excluir item</button>`}
 
+/* Perfil e propriedades */
+const avatar=s=>user.photoURL?`<img src="${esc(user.photoURL)}" alt="" referrerpolicy="no-referrer" style="width:${s}px;height:${s}px;border-radius:50%;border:1px solid #B8893B;object-fit:cover;flex:none">`:`<div class="b" style="width:${s}px;height:${s}px;border-radius:50%;background:#2B1810;color:#E3C98F;font:700 ${Math.round(s/2.4)}px Inter,sans-serif">${esc((user.displayName||'?')[0])}</div>`;
+function vPerfil(){
+  const dono=sitio?.donoUid===user.uid;
+  return `${back('home')}<h1>Meu perfil</h1>
+<div class="c" style="align-items:center;text-align:center">${avatar(84)}<h2>${esc(user.displayName||'Sem nome')}</h2><div class="m">${esc(user.email||'')}</div></div>
+<div class="c"><h2>Propriedade ativa</h2><div class="m">${esc(sitio?.nome||'—')} · você é ${dono?'dono':'membro'}</div><button class="btn w2" data-go="props">Minhas propriedades (${props.length})</button></div>
+<div class="c"><h2>Dados</h2><div class="m">Baixe uma cópia de tudo da propriedade ativa.</div><button class="btn w2" data-act="exportar">Exportar dados (backup)</button></div>
+<div class="c"><h2>Conta</h2><div class="m">Login feito com a sua conta Google. Sair desconecta só este aparelho.</div><button class="btn w2" data-act="logout">Sair da conta</button></div>
+<div class="m" style="text-align:center">App Sítio · versão 3</div>`}
+function vProps(){
+  return `${back('home')}<h1>Minhas propriedades</h1><div class="m">Cada propriedade tem seus próprios canteiros, ferramentas, paiol e tanques.</div>`+
+  props.map(p=>`<div class="c"><div class="r"><div class="f1"><h2>${esc(p.nome)}</h2><div class="m">${esc(p.tipo||'Sítio')}${p.cidade?' · '+esc(p.cidade):''} · ${p.donoUid===user.uid?'dono':'membro'}</div></div>${p.id===sid?'<span class="t">Ativa</span>':''}</div>${p.id===sid?`<button class="btn w2 sm" data-act="renomear">Renomear</button>`:`<button class="btn sm" data-act="trocar" data-id="${p.id}">Abrir esta propriedade</button>`}</div>`).join('')+
+  `<button class="btn" data-act="propnovo">+ Nova propriedade</button><div class="m">Convidar outras pessoas para a mesma propriedade chega em uma próxima etapa.</div>`}
+function vPropNovo(){return `${back('props')}<h1>Nova propriedade</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Fazenda Santa Luzia"'))}${field('tipo','Tipo',selH('tipo',['Sítio','Fazenda','Chácara','Outro'].map(x=>[x,x]),'Sítio'))}${field('cidade','Cidade (opcional)',inp('cidade','','placeholder="Ex.: Marechal Floriano"'))}<button class="btn" data-act="propsalvar">Criar propriedade</button>`}
+
 /* ---------- render ---------- */
-const VIEWS={home:vHome,hortas:vHortas,novo:vNovo,detalhe:vDetalhe,oficina:vOficina,ofnovo:vOfNovo,ofdet:vOfDet,paiol:vPaiol,panovo:vPaNovo,padet:vPaDet};
-const AREA={home:'home',hortas:'hortas',novo:'hortas',detalhe:'hortas',oficina:'oficina',ofnovo:'oficina',ofdet:'oficina',paiol:'paiol',panovo:'paiol',padet:'paiol'};
+const VIEWS={perfil:vPerfil,props:vProps,propnovo:vPropNovo,home:vHome,hortas:vHortas,novo:vNovo,detalhe:vDetalhe,oficina:vOficina,ofnovo:vOfNovo,ofdet:vOfDet,paiol:vPaiol,panovo:vPaNovo,padet:vPaDet};
+const AREA={perfil:'home',props:'home',propnovo:'home',home:'home',hortas:'hortas',novo:'hortas',detalhe:'hortas',oficina:'oficina',ofnovo:'oficina',ofdet:'oficina',paiol:'paiol',panovo:'paiol',padet:'paiol'};
 function render(){
   const app=$('#app'),nav=$('#nav');
+  if(erroDb&&(!sid||!user)){nav.hidden=true;app.innerHTML=splash(erroDb);return}
+  if(!authReady||!splashOk||(user&&!sid)){nav.hidden=true;app.innerHTML=splash(authReady&&user?'Carregando seu sítio…':'Abrindo…');return}
   if(!user){nav.hidden=true;app.innerHTML=vLogin();return}
-  if(!sid){nav.hidden=true;app.innerHTML=`<div class="c" style="margin-top:40vh"><div class="m" style="text-align:center">${esc(erroDb)||'Carregando seu sítio…'}</div></div>`;return}
   app.innerHTML=VIEWS[view]();
   nav.hidden=false;const on=AREA[view];
   nav.innerHTML=[['home','Início'],['hortas','Hortas'],['oficina','Oficina'],['paiol','Paiol']].map(([k,l])=>`<button class="${on===k?'on':''}" data-go="${k}">${l}</button>`).join('')+`<button class="off" data-act="soon">Peixes</button>`;
@@ -214,15 +350,23 @@ document.addEventListener('click',async e=>{
     else if(a==='novo'){view='novo';render()}
     else if(a==='abrir'){selId=id;view='detalhe';render();scrollTo(0,0)}
     else if(a==='salvar'){
-      const k=val('planta'),rd=num('rd'),cd=num('cd'),pl=val('plantio');
-      if(!pl||!(rd>=1)||!(cd>=1)){toast('Confira a data e os intervalos');return}
+      const pn=val('planta').trim(),rd=num('rd'),cd=num('cd'),pl=val('plantio');
+      if(!pn||!pl||!(rd>=1)||!(cd>=1)){toast('Informe a planta, a data e os intervalos');return}
       el.disabled=true;
-      await addDoc(col('canteiros'),{nome:val('nome').trim()||'Canteiro',tipo:k,planta:k==='outra'?(val('outra').trim()||'Outra planta'):PRE[k].n,plantio:new Date(pl+'T00:00:00').getTime(),regaDias:rd,capinaDias:cd,criadoEm:Date.now()});
-      view='hortas';render();toast('Canteiro salvo')}
+      await addDoc(col('canteiros'),{nome:val('nome').trim()||'Canteiro',planta:pn,plantio:new Date(pl+'T00:00:00').getTime(),regaDias:rd,capinaDias:cd,criadoEm:Date.now()});
+      ensureHolo(pn,'planta').catch(()=>{});view='hortas';render();toast('Canteiro salvo')}
     else if(a==='reguei'){await updateDoc(dref('canteiros',id),{ultimaRega:Date.now()});await ganhar(20);toast('Rega registrada')}
     else if(a==='capinei'){await updateDoc(dref('canteiros',id),{ultimaCapina:Date.now()});await ganhar(30);toast('Capina registrada')}
     else if(a==='feito'){const t=el.dataset.t;await updateDoc(dref('canteiros',id),t==='r'?{ultimaRega:Date.now()}:{ultimaCapina:Date.now()});await ganhar(t==='r'?20:30);toast('Feito!')}
     else if(a==='excluir'){if(confirm('Excluir este canteiro?')){await deleteDoc(dref('canteiros',id));view='hortas';render()}}
+    else if(a==='propnovo'){view='propnovo';render()}
+    else if(a==='propsalvar'){
+      const nome=val('nome').trim();if(!nome){toast('Informe o nome da propriedade');return}
+      el.disabled=true;
+      const r=await addDoc(collection(db,'sitios'),{nome,tipo:val('tipo'),cidade:val('cidade').trim(),donoUid:user.uid,memberUids:[user.uid],xp:0,criadoEm:Date.now()});
+      await setDoc(doc(db,'users',user.uid),{sitioId:r.id},{merge:true});abrirSitio(r.id);view='home';render();toast('Propriedade criada')}
+    else if(a==='trocar'){await setDoc(doc(db,'users',user.uid),{sitioId:id},{merge:true});abrirSitio(id);view='home';render();scrollTo(0,0)}
+    else if(a==='renomear'){const n=(prompt('Novo nome da propriedade:',sitio?.nome||'')||'').trim();if(n)await updateDoc(doc(db,'sitios',sid),{nome:n})}
     /* oficina */
     else if(a==='ofnovo'){view='ofnovo';render()}
     else if(a==='ofabrir'){selId=id;view='ofdet';render();scrollTo(0,0)}
@@ -230,8 +374,8 @@ document.addEventListener('click',async e=>{
       const nome=val('nome').trim(),qtd=num('qtd'),min=num('min')||0;
       if(!nome||!(qtd>=0)){toast('Informe o nome e a quantidade');return}
       el.disabled=true;
-      await addDoc(col('ferramentas'),{nome,tipo:val('tipo'),qtd,min,local:val('local').trim(),estado:val('estado'),emprestada:null,criadoEm:Date.now()});
-      view='oficina';render();toast('Ferramenta salva')}
+      await addDoc(col('ferramentas'),{nome,qtd,min,local:val('local').trim(),estado:val('estado'),emprestada:null,criadoEm:Date.now()});
+      ensureHolo(nome,'ferramenta').catch(()=>{});view='oficina';render();toast('Ferramenta salva')}
     else if(a==='qmais'||a==='qmenos'){await updateDoc(dref('ferramentas',id),{qtd:increment(a==='qmais'?1:-1)})}
     else if(a==='emprestar'){const com=(prompt('Quem pegou a ferramenta?')||'').trim();if(com)await updateDoc(dref('ferramentas',id),{emprestada:{com,desde:Date.now()}})}
     else if(a==='devolveu'){await updateDoc(dref('ferramentas',id),{emprestada:null});toast('Devolvida')}
@@ -244,25 +388,30 @@ document.addEventListener('click',async e=>{
       if(!nome||!(qtd>=0)){toast('Informe o nome e a quantidade');return}
       el.disabled=true;
       await addDoc(col('itens'),{nome,cat:val('cat'),unidade:val('unidade').trim()||'un',qtd,min,validade:v?new Date(v+'T00:00:00').getTime():null,criadoEm:Date.now()});
-      view='paiol';render();toast('Item salvo')}
+      ensureHolo(nome,'insumo').catch(()=>{});view='paiol';render();toast('Item salvo')}
     else if(a==='entrada'||a==='saida'){
-      const i=itens.find(x=>x.id===id),n=num('mq');
+      const i=itens.find(x=>x.id===id),n=num(a==='entrada'?'rq':'sq');
       if(!(n>0)){toast('Informe a quantidade');return}
       if(a==='saida'&&n>i.qtd){toast('Estoque insuficiente');return}
       const b=writeBatch(db);
       b.update(dref('itens',id),{qtd:increment(a==='entrada'?n:-n)});
-      b.set(doc(col('movimentos')),{itemId:id,nome:i.nome,tipo:a,qtd:n,unidade:i.unidade,destino:val('md'),em:Date.now()});
-      await b.commit();toast(a==='entrada'?'Entrada registrada':'Saída registrada')}
+      b.set(doc(col('movimentos')),{itemId:id,nome:i.nome,tipo:a,qtd:n,unidade:i.unidade,destino:a==='saida'?val('sd'):'',em:Date.now()});
+      await b.commit();toast(a==='entrada'?'Reposição registrada':'Saída registrada')}
     else if(a==='paexcluir'){if(confirm('Excluir este item? O histórico dele continua nos backups.')){await deleteDoc(dref('itens',id));view='paiol';render()}}
   }catch(err){console.error(err);toast('Algo deu errado: '+(err.code||err.message))}
 });
 document.addEventListener('change',async e=>{
   const t=e.target;
-  if(t.id==='planta'){const p=PRE[t.value];$('#rd').value=p.r;$('#cd').value=p.c;$('#nomeOutra').hidden=t.value!=='outra'}
-  else if(t.id==='cat'&&view==='panovo'){$('#unidade').value=CAT[t.value].u}
+  if(t.id==='cat'&&view==='panovo'){$('#unidade').value=CAT[t.value].u}
   else if(t.id==='estado'&&view==='ofdet'){try{await updateDoc(dref('ferramentas',selId),{estado:t.value})}catch(err){toast('Erro: '+(err.code||err.message))}}
 });
-document.addEventListener('input',e=>{if(e.target.id==='busca'){q=e.target.value;$('#lista').innerHTML=listaOf()}});
+const presetFor=n=>Object.values(PRE).find(p=>p.n!=='Outra planta'&&norm(n).includes(norm(p.n)));
+function prev(){const p=$('#prev');if(!p)return;const kind=view==='novo'?'planta':view==='ofnovo'?'ferramenta':'insumo',n=val(view==='novo'?'planta':'nome').trim();p.innerHTML=n?`${mini(H(n,kind),44)}<span class="m">Holograma gerado automaticamente${holos[slug(n)]?' (já existia)':''}</span>`:''}
+document.addEventListener('input',e=>{
+  const id=e.target.id;
+  if(id==='busca'){q=e.target.value;$('#lista').innerHTML=listaOf()}
+  else if(id==='planta'||id==='nome'){prev();if(id==='planta'){const p=presetFor(e.target.value);if(p){$('#rd').value=p.r;$('#cd').value=p.c}}}
+});
 
 /* ---------- backup ---------- */
 function exportar(){
@@ -273,8 +422,21 @@ function exportar(){
 
 /* ---------- login e dados ---------- */
 function falha(err){erroDb='Não consegui acessar o banco. Verifique se o Firestore foi criado e as regras publicadas.';console.error(err);toast('Erro no banco de dados');render()}
+let dataUnsubs=[];
+const sub=(n,set,ref)=>onSnapshot(ref||col(n),s=>{set(s.docs.map(d=>({id:d.id,...d.data()})));refresh()},falha);
+function abrirSitio(id){
+  dataUnsubs.forEach(f=>f());dataUnsubs=[];sid=id;sitio=null;cants=[];fers=[];itens=[];movs=[];holos={};
+  dataUnsubs.push(onSnapshot(doc(db,'sitios',sid),s=>{sitio=s.data();refresh()},falha),
+    sub('canteiros',a=>cants=a.sort((x,y)=>x.criadoEm-y.criadoEm)),
+    sub('ferramentas',a=>fers=a),
+    sub('hologramas',a=>{holos=Object.fromEntries(a.map(x=>[x.id,x]))}),
+    sub('itens',a=>itens=a),
+    sub('movimentos',a=>movs=a,query(col('movimentos'),orderBy('em','desc'),limit(200))));
+  render();
+}
 onAuthStateChanged(auth,async u=>{
-  unsubs.forEach(f=>f());unsubs=[];user=u;sid=null;sitio=null;cants=[];fers=[];itens=[];movs=[];erroDb='';view='home';render();
+  unsubs.forEach(f=>f());unsubs=[];dataUnsubs.forEach(f=>f());dataUnsubs=[];
+  user=u;authReady=true;holos={};sid=null;sitio=null;props=[];cants=[];fers=[];itens=[];movs=[];erroDb='';view='home';render();
   if(!u)return;
   try{
     const uref=doc(db,'users',u.uid);let id=(await getDoc(uref)).data()?.sitioId;
@@ -284,14 +446,8 @@ onAuthStateChanged(auth,async u=>{
       const r=await addDoc(collection(db,'sitios'),{nome:'Sítio Bom Jesus',donoUid:u.uid,memberUids:[u.uid],xp:0,criadoEm:Date.now()});
       await setDoc(uref,{sitioId:r.id},{merge:true});id=r.id;
     }
-    sid=id;
-    const sub=(n,set,ref)=>onSnapshot(ref||col(n),s=>{set(s.docs.map(d=>({id:d.id,...d.data()})));refresh()},falha);
-    unsubs.push(onSnapshot(doc(db,'sitios',sid),s=>{sitio=s.data();refresh()},falha));
-    unsubs.push(sub('canteiros',a=>cants=a.sort((x,y)=>x.criadoEm-y.criadoEm)));
-    unsubs.push(sub('ferramentas',a=>fers=a));
-    unsubs.push(sub('itens',a=>itens=a));
-    unsubs.push(sub('movimentos',a=>movs=a,query(col('movimentos'),orderBy('em','desc'),limit(200))));
-    render();
+    unsubs.push(onSnapshot(query(collection(db,'sitios'),where('memberUids','array-contains',u.uid)),s=>{props=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.criadoEm-b.criadoEm);refresh()},falha));
+    abrirSitio(id);
   }catch(err){falha(err)}
 });
 render();
