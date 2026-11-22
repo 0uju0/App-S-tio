@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sítio Bom Jesus</title>
+<meta name="theme-color" content="#2B1810">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sítio">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@600;700&display=swap">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,sans-serif;color:#2B1810;background:radial-gradient(ellipse 120% 40% at 15% 0%,rgba(255,255,255,.95),transparent 70%),linear-gradient(118deg,transparent 30%,rgba(184,137,59,.14) 30.4%,transparent 31.2%),linear-gradient(118deg,transparent 58%,rgba(43,24,16,.07) 58.3%,transparent 59.4%),linear-gradient(64deg,transparent 70%,rgba(184,137,59,.12) 70.3%,transparent 71.2%),linear-gradient(152deg,transparent 12%,rgba(107,90,76,.08) 12.4%,transparent 13.6%),linear-gradient(180deg,#F8F5F0,#EFE9E0) fixed}
+#app{max-width:430px;margin:0 auto;min-height:100dvh;padding:calc(env(safe-area-inset-top) + 20px) 18px 100px;display:flex;flex-direction:column;gap:12px}
+h1{margin:0;font-family:'Playfair Display',serif;font-size:27px;font-weight:700}h2{margin:0;font-size:15px;font-weight:700}
+.m{font-size:13px;color:#6B5A4C}
+.c{background:#FFFDF9;border:1px solid #D9C29A;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 16px rgba(43,24,16,.08)}
+.r{display:flex;align-items:center;gap:12px}.f1{flex:1}
+.b{border-radius:12px;border:1px solid #B8893B;display:flex;align-items:center;justify-content:center;flex:none}
+.t{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:linear-gradient(#E3C98F,#C9A25B);color:#2B1810;border:1px solid #9C7430;white-space:nowrap}
+.w{background:#F1E7D3;color:#5C3E10}.p{background:#F2C7C0;border-color:#B3322B;color:#5A1710}
+.bar{height:10px;border-radius:99px;background:#EADFCB;overflow:hidden;border:1px solid #D9C29A}.bar i{display:block;height:100%;background:linear-gradient(90deg,#B8893B,#D9BB7A)}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.big{border:1px solid #B8893B;box-shadow:0 8px 18px rgba(43,24,16,.22);border-radius:16px;padding:14px;min-height:84px;text-align:left;font:700 15px Inter,sans-serif;background:#2B1810;color:#E3C98F;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;cursor:pointer}
+.big span{font-size:12px;font-weight:600;color:#BFAE98}.big.off{opacity:.55}
+.btn{border:1px solid #9C7430;box-shadow:0 4px 10px rgba(43,24,16,.18);border-radius:12px;min-height:48px;padding:0 16px;font:700 15px Inter,sans-serif;color:#2B1810;background:linear-gradient(#E3C98F,#C9A25B);cursor:pointer}
+.btn.w2{background:#fff}.btn.sm{min-height:44px;padding:0 14px}.btn:disabled{opacity:.5}
+.in{width:100%;border:1px solid #D9C29A;background:#fff;border-radius:10px;padding:12px 14px;font:400 15px Inter,sans-serif;color:#2B1810;min-height:46px}
+label{font-size:13px;color:#6B5A4C;display:block;margin-bottom:4px}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100%);height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#2B1810;border-top:1px solid #B8893B;display:flex;justify-content:space-around;align-items:center}
+nav button{background:none;border:0;color:#BFAE98;font:600 12px Inter,sans-serif;padding:12px 6px;cursor:pointer}nav button.on{color:#E3C98F}nav button.off{opacity:.5}
+.h{display:flex;justify-content:center}.fl{animation:f 3s ease-in-out infinite}
+@keyframes f{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#2B1810;color:#E3C98F;padding:10px 16px;border-radius:99px;font-size:13px;display:none;max-width:90%;text-align:center;z-index:9}
+.link{background:none;border:0;color:#6B5A4C;font:600 13px Inter,sans-serif;text-decoration:underline;cursor:pointer;padding:8px}
+</style>
+</head>
+<body>
+<div id="app"></div><nav id="nav" hidden></nav><div id="toast" role="status"></div>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,increment} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDnFinb5lTgHk0MiZ1Lo6OorqdezcKo4Cc",
+  authDomain: "sitio-bom-jesus.firebaseapp.com",
+  databaseURL: "https://sitio-bom-jesus-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sitio-bom-jesus",
+  storageBucket: "sitio-bom-jesus.firebasestorage.app",
+  messagingSenderId: "55293786879",
+  appId: "1:55293786879:web:32c4f9d453927074f5eaca"
+};
+const fb=initializeApp(firebaseConfig), auth=getAuth(fb), db=getFirestore(fb);
+
+/* ---------- utilidades ---------- */
+const DAY=864e5, $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const d0=t=>new Date(t).setHours(0,0,0,0);
+const fmt=t=>new Date(t).toLocaleDateString('pt-BR');
+const toast=m=>{const e=$('#toast');e.textContent=m;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)};
+
+/* ---------- plantas (valores iniciais editáveis) ---------- */
+const PRE={tomate:{n:'Tomate',r:2,c:15,g:'tomate'},alface:{n:'Alface',r:1,c:10,g:'alface'},cenoura:{n:'Cenoura',r:2,c:15,g:'cenoura'},outra:{n:'Outra planta',r:3,c:15,g:'broto'}};
+
+/* ---------- hologramas ---------- */
+const OL='stroke="#0B0620" stroke-width="2.5" stroke-linejoin="round"'.replace('#0B0620','#2B1810');
+const GL={
+tomate:`<path d="M30 14v-6" stroke="#6B7F3F" stroke-width="4"/><circle cx="30" cy="32" r="16" fill="#E0574B" ${OL}/><path d="M22 18l8 5 8-5" fill="none" stroke="#6B7F3F" stroke-width="3"/>`,
+alface:`<circle cx="30" cy="32" r="17" fill="#A9B58A" ${OL}/><circle cx="30" cy="32" r="9" fill="#C9D4A8" ${OL}/>`,
+cenoura:`<polygon points="20,24 40,24 30,54" fill="#D9773F" ${OL}/><path d="M30 24l-7-12M30 24v-14M30 24l7-12" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/>`,
+broto:`<path d="M30 52V26" stroke="#6B7F3F" stroke-width="4"/><path d="M30 34C18 34 14 24 14 18c10 0 16 5 16 16z" fill="#A9B58A" ${OL}/><path d="M30 28c0-8 6-13 16-13 0 6-4 13-16 13z" fill="#C9D4A8" ${OL}/>`};
+const mini=(g,s=50)=>`<div class="b" style="width:${s+6}px;height:${s+6}px;background:#2B1810"><svg viewBox="0 0 60 60" width="${s}" height="${s}" aria-hidden="true"><ellipse cx="30" cy="55" rx="20" ry="4" fill="#C9A25B" opacity=".5"/>${GL[g]}</svg></div>`;
+const PLOTS=`<polygon points="150,60 188,80 150,100 112,80" fill="#8A5A2B" stroke="#2B1810" stroke-width="3"/><circle cx="150" cy="76" r="7" fill="#E8A29A" stroke="#2B1810" stroke-width="2"/><circle cx="133" cy="82" r="6" fill="#D9773F" stroke="#2B1810" stroke-width="2"/><circle cx="167" cy="82" r="6" fill="#E3C98F" stroke="#2B1810" stroke-width="2"/><path d="M150 76v-14M133 82v-12M167 82v-12" stroke="#6B7F3F" stroke-width="4"/>`;
+const island=(inner,w)=>`<div class="h"><svg viewBox="0 0 300 200" width="${w}" height="${w*2/3}" role="img" aria-label="Holograma flutuante"><defs><linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#C9A25B" stop-opacity=".55"/><stop offset="1" stop-color="#C9A25B" stop-opacity="0"/></linearGradient></defs><polygon points="70,186 230,186 200,100 100,100" fill="url(#bm)"/><ellipse cx="150" cy="186" rx="90" ry="12" fill="#C9A25B" opacity=".4" stroke="#B8893B" stroke-width="2"/><g class="fl"><polygon points="76,98 224,98 150,164" fill="#4A2E20" stroke="#2B1810" stroke-width="3" stroke-linejoin="round"/><polygon points="150,50 232,92 150,134 68,92" fill="#F3EEE4" stroke="#2B1810" stroke-width="3" stroke-linejoin="round"/>${inner}</g></svg></div>`;
+const bigGlyph=g=>`<g transform="translate(110,30) scale(1.3)">${GL[g]}</g>`;
+
+/* ---------- estado ---------- */
+let user=null, xp=0, cants=[], view='home', sel=null, unsubs=[], erroDb='';
+
+const nextT=(c,t)=>(t==='r'?(c.ultimaRega||c.plantio)+c.regaDias*DAY:(c.ultimaCapina||c.plantio)+c.capinaDias*DAY);
+const dias=(c,t)=>Math.round((d0(nextT(c,t))-d0(Date.now()))/DAY);
+const quando=d=>d<0?`atrasada ${-d} d`:d===0?'hoje':d===1?'amanhã':`em ${d} dias`;
+const avisos=()=>{const a=[];cants.forEach(c=>{[['r','Regar'],['c','Capinar']].forEach(([t,v])=>{const d=dias(c,t);if(d<=0)a.push({c,t,v,d})})});return a.sort((x,y)=>x.d-y.d)};
+const nivel=()=>({n:Math.floor(xp/1000)+1,p:(xp%1000)/10});
+
+/* ---------- telas ---------- */
+function vLogin(){return `<div style="height:20px"></div>${island(PLOTS,320)}<div style="text-align:center"><h1 style="font-size:34px">Sítio Bom Jesus</h1><div class="m">Hortas, oficina, paiol e piscicultura em um só lugar</div></div><div style="flex:1"></div><button class="btn" data-act="login" style="background:#fff">Entrar com Google</button><div class="m" style="text-align:center">${esc(erroDb)}</div>`}
+
+function vHome(){
+  const L=nivel(),A=avisos(),nome=esc((user.displayName||'').split(' ')[0]||'');
+  const av=A.length?A.map(a=>`<div class="c"><div class="r">${mini(PRE[a.c.tipo]?.g||'broto',44)}<div class="f1"><h2>${a.v} ${esc(a.c.nome)}</h2><div class="m">${esc(a.c.planta)} · ${quando(a.d)}</div></div><button class="btn sm" data-act="feito" data-id="${a.c.id}" data-t="${a.t}" aria-label="Marcar como feito">Feito</button></div></div>`).join(''):`<div class="c"><div class="m">Nenhum aviso agora. Tudo em dia.</div></div>`;
+  return `<div class="r"><div class="f1"><div class="m">Olá</div><h1>${nome||'Bem-vindo'}</h1></div><button class="link" data-act="logout">Sair</button></div>
+<div class="c"><div class="r"><h2 class="f1">Nível ${L.n} · Sítio em crescimento</h2><span class="t w">${xp} XP</span></div><div class="bar"><i style="width:${L.p}%"></i></div></div>
+<div><h2>Avisos de hoje</h2><div class="m">Ao marcar como feito, o aviso some daqui</div></div>${av}
+<div class="g"><button class="big" data-go="hortas">Hortas<span>${cants.length} canteiro(s)</span></button><button class="big off" data-act="soon">Ferramentaria<span>em breve</span></button><button class="big off" data-act="soon">Paiol<span>em breve</span></button><button class="big off" data-act="soon">Piscicultura<span>em breve</span></button></div>`}
+
+function vHortas(){
+  const rows=cants.map(c=>{const d=Math.min(dias(c,'r'),dias(c,'c')),t=dias(c,'r')<=dias(c,'c')?'Regar':'Capinar';
+    return `<button class="c" data-act="abrir" data-id="${c.id}" style="text-align:left;font:inherit;color:inherit;cursor:pointer"><div class="r">${mini(PRE[c.tipo]?.g||'broto')}<div class="f1"><h2>${esc(c.nome)} · ${esc(c.planta)}</h2><div class="m">Plantio ${fmt(c.plantio)}</div></div><span class="t ${d<0?'p':d===0?'w':''}">${d<=0?t:'Em '+d+' d'}</span></div></button>`}).join('');
+  return `<h1>Plantações e Hortas</h1>${island(PLOTS,220)}${rows||'<div class="c"><div class="m">Nenhum canteiro ainda. Cadastre o primeiro.</div></div>'}<button class="btn" data-act="novo">+ Novo canteiro</button>`}
+
+function vNovo(){
+  const hoje=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+  return `<div class="m"><button class="link" data-go="hortas">‹ Voltar</button></div><h1>Novo canteiro</h1>
+<div><label for="nome">Nome do canteiro</label><input class="in" id="nome" value="Canteiro ${cants.length+1}"></div>
+<div><label for="planta">Planta</label><select class="in" id="planta">${Object.entries(PRE).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('')}</select></div>
+<div id="nomeOutra" hidden><label for="outra">Nome da planta</label><input class="in" id="outra" placeholder="Ex.: couve"></div>
+<div><label for="plantio">Data de plantio</label><input class="in" type="date" id="plantio" value="${hoje}"></div>
+<div class="g"><div><label for="rd">Regar a cada (dias)</label><input class="in" type="number" min="1" id="rd" value="${PRE.tomate.r}"></div><div><label for="cd">Capinar a cada (dias)</label><input class="in" type="number" min="1" id="cd" value="${PRE.tomate.c}"></div></div>
+<div class="m">Os intervalos são valores iniciais de exemplo. Ajuste conforme seu clima e solo.</div><button class="btn" data-act="salvar">Salvar canteiro</button>`}
+
+function vDetalhe(){
+  const c=cants.find(x=>x.id===sel);if(!c)return vHortas();
+  const g=PRE[c.tipo]?.g||'broto',dr=dias(c,'r'),dc=dias(c,'c');
+  return `<div class="m"><button class="link" data-go="hortas">‹ Voltar</button></div><div class="r"><h1 class="f1">${esc(c.planta)}</h1><span class="t">${esc(c.nome)}</span></div>${island(bigGlyph(g),210)}
+<div class="c"><h2>Regar</h2><div class="m">Última: ${c.ultimaRega?fmt(c.ultimaRega):'ainda não'} · a cada ${c.regaDias} d</div><span class="t ${dr<0?'p':dr===0?'w':''}" style="align-self:flex-start">Próxima: ${quando(dr)} (${fmt(nextT(c,'r'))})</span><button class="btn" data-act="reguei" data-id="${c.id}">Reguei · +20 XP</button></div>
+<div class="c"><h2>Capinar</h2><div class="m">Última: ${c.ultimaCapina?fmt(c.ultimaCapina):'ainda não'} · a cada ${c.capinaDias} d</div><span class="t ${dc<0?'p':dc===0?'w':''}" style="align-self:flex-start">Próxima: ${quando(dc)} (${fmt(nextT(c,'c'))})</span><button class="btn" data-act="capinei" data-id="${c.id}">Capinei · +30 XP</button></div>
+<div class="m" style="text-align:center">Plantado em ${fmt(c.plantio)}</div><button class="btn w2" data-act="excluir" data-id="${c.id}">Excluir canteiro</button>`}
+
+function render(){
+  const app=$('#app'),nav=$('#nav');
+  if(!user){nav.hidden=true;app.innerHTML=vLogin();return}
+  app.innerHTML=({home:vHome,hortas:vHortas,novo:vNovo,detalhe:vDetalhe})[view]();
+  nav.hidden=false;
+  const on=view==='home'?'home':'hortas';
+  nav.innerHTML=[['home','Início'],['hortas','Hortas']].map(([k,l])=>`<button class="${on===k?'on':''}" data-go="${k}">${l}</button>`).join('')+['Oficina','Paiol','Peixes'].map(l=>`<button class="off" data-act="soon">${l}</button>`).join('');
+}
+
+/* ---------- ações ---------- */
+const uref=p=>doc(db,'users',user.uid,...p);
+const ganhar=n=>setDoc(doc(db,'users',user.uid),{xp:increment(n)},{merge:true});
+document.addEventListener('click',async e=>{
+  const g=e.target.closest('[data-go]');if(g){view=g.dataset.go;render();scrollTo(0,0);return}
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act,id=el.dataset.id;
+  try{
+    if(a==='login'){await signInWithPopup(auth,new GoogleAuthProvider())}
+    else if(a==='logout'){await signOut(auth)}
+    else if(a==='soon'){toast('Essa área chega nas próximas etapas')}
+    else if(a==='novo'){view='novo';render()}
+    else if(a==='abrir'){sel=id;view='detalhe';render();scrollTo(0,0)}
+    else if(a==='salvar'){
+      const k=$('#planta').value,rd=+$('#rd').value,cd=+$('#cd').value,pl=$('#plantio').value;
+      if(!pl||rd<1||cd<1){toast('Confira a data e os intervalos');return}
+      const nome=$('#nome').value.trim()||'Canteiro';
+      const planta=k==='outra'?($('#outra').value.trim()||'Outra planta'):PRE[k].n;
+      el.disabled=true;
+      await addDoc(collection(db,'users',user.uid,'canteiros'),{nome,tipo:k,planta,plantio:new Date(pl+'T00:00:00').getTime(),regaDias:rd,capinaDias:cd,criadoEm:Date.now()});
+      view='hortas';render();toast('Canteiro salvo')}
+    else if(a==='reguei'){await updateDoc(uref(['canteiros',id]),{ultimaRega:Date.now()});await ganhar(20);toast('Rega registrada · +20 XP')}
+    else if(a==='capinei'){await updateDoc(uref(['canteiros',id]),{ultimaCapina:Date.now()});await ganhar(30);toast('Capina registrada · +30 XP')}
+    else if(a==='feito'){const t=el.dataset.t;await updateDoc(uref(['canteiros',id]),t==='r'?{ultimaRega:Date.now()}:{ultimaCapina:Date.now()});await ganhar(t==='r'?20:30);toast('Feito! +'+(t==='r'?20:30)+' XP')}
+    else if(a==='excluir'){if(confirm('Excluir este canteiro?')){await deleteDoc(uref(['canteiros',id]));view='hortas';render()}}
+  }catch(err){console.error(err);toast('Algo deu errado: '+(err.code||err.message))}
+});
+document.addEventListener('change',e=>{
+  if(e.target.id==='planta'){const p=PRE[e.target.value];$('#rd').value=p.r;$('#cd').value=p.c;$('#nomeOutra').hidden=e.target.value!=='outra'}
+});
+
+/* ---------- login e dados ---------- */
+const refresh=()=>{if(view!=='novo')render()};
+onAuthStateChanged(auth,u=>{
+  unsubs.forEach(f=>f());unsubs=[];user=u;cants=[];xp=0;erroDb='';
+  if(u){
+    const falha=err=>{erroDb='Não consegui acessar o banco. Verifique se o Firestore foi criado e as regras publicadas.';console.error(err);toast('Erro no banco de dados');render()};
+    unsubs.push(onSnapshot(collection(db,'users',u.uid,'canteiros'),s=>{cants=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.criadoEm-b.criadoEm);refresh()},falha));
+    unsubs.push(onSnapshot(doc(db,'users',u.uid),s=>{xp=s.data()?.xp||0;refresh()},falha));
+  }
+  view='home';render();
+});
+render();
+</script>
+</body>
+</html>
