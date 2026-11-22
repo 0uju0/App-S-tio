@@ -17,7 +17,7 @@ body{margin:0;font-family:Inter,sans-serif;color:#2B1810;background:radial-gradi
 h1{margin:0;font-family:'Playfair Display',serif;font-size:27px;font-weight:700}h2{margin:0;font-size:15px;font-weight:700}
 .m{font-size:13px;color:#6B5A4C}
 .c{background:#FFFDF9;border:1px solid #D9C29A;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 16px rgba(43,24,16,.08)}
-.r{display:flex;align-items:center;gap:12px}.f1{flex:1}
+.r{display:flex;align-items:center;gap:12px}.f1{flex:1;min-width:0}
 .b{border-radius:12px;border:1px solid #B8893B;display:flex;align-items:center;justify-content:center;flex:none}
 .t{font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;background:linear-gradient(#E3C98F,#C9A25B);color:#2B1810;border:1px solid #9C7430;white-space:nowrap}
 .w{background:#F1E7D3;color:#5C3E10}.p{background:#F2C7C0;border-color:#B3322B;color:#5A1710}
@@ -29,12 +29,14 @@ h1{margin:0;font-family:'Playfair Display',serif;font-size:27px;font-weight:700}
 .btn.w2{background:#fff}.btn.sm{min-height:44px;padding:0 14px}.btn:disabled{opacity:.5}
 .in{width:100%;border:1px solid #D9C29A;background:#fff;border-radius:10px;padding:12px 14px;font:400 15px Inter,sans-serif;color:#2B1810;min-height:46px}
 label{font-size:13px;color:#6B5A4C;display:block;margin-bottom:4px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid #D9C29A;background:#fff;color:#2B1810;border-radius:99px;padding:8px 14px;font:600 13px Inter,sans-serif;cursor:pointer;min-height:40px}.chip.on{background:linear-gradient(#E3C98F,#C9A25B);border-color:#9C7430}
+.box{flex:1;align-items:center;padding:8px;text-align:center}.box b{font-size:19px}
 nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100%);height:calc(64px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#2B1810;border-top:1px solid #B8893B;display:flex;justify-content:space-around;align-items:center}
 nav button{background:none;border:0;color:#BFAE98;font:600 12px Inter,sans-serif;padding:12px 6px;cursor:pointer}nav button.on{color:#E3C98F}nav button.off{opacity:.5}
 .h{display:flex;justify-content:center}.fl{animation:f 3s ease-in-out infinite}
 @keyframes f{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 #toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#2B1810;color:#E3C98F;padding:10px 16px;border-radius:99px;font-size:13px;display:none;max-width:90%;text-align:center;z-index:9}
-.link{background:none;border:0;color:#6B5A4C;font:600 13px Inter,sans-serif;text-decoration:underline;cursor:pointer;padding:8px}
+.link{background:none;border:0;color:#6B5A4C;font:600 13px Inter,sans-serif;text-decoration:underline;cursor:pointer;padding:8px 0}
 </style>
 </head>
 <body>
@@ -42,7 +44,7 @@ nav button{background:none;border:0;color:#BFAE98;font:600 12px Inter,sans-serif
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,increment} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getFirestore,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,getDoc,getDocs,increment,writeBatch,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDnFinb5lTgHk0MiZ1Lo6OorqdezcKo4Cc",
@@ -55,121 +57,242 @@ const firebaseConfig = {
 };
 const fb=initializeApp(firebaseConfig), auth=getAuth(fb), db=getFirestore(fb);
 
+/* Troque para true quando o app for lançado: a contagem de XP começa a valer. */
+const XP_ATIVO=false;
+
 /* ---------- utilidades ---------- */
-const DAY=864e5, $=s=>document.querySelector(s);
+const DAY=864e5,$=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const d0=t=>new Date(t).setHours(0,0,0,0);
 const fmt=t=>new Date(t).toLocaleDateString('pt-BR');
 const toast=m=>{const e=$('#toast');e.textContent=m;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)};
+const val=id=>$('#'+id)?.value??'';
+const hojeISO=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+const xpTxt=n=>XP_ATIVO?` · +${n} XP`:'';
 
-/* ---------- plantas (valores iniciais editáveis) ---------- */
+/* ---------- catálogos (valores iniciais editáveis) ---------- */
 const PRE={tomate:{n:'Tomate',r:2,c:15,g:'tomate'},alface:{n:'Alface',r:1,c:10,g:'alface'},cenoura:{n:'Cenoura',r:2,c:15,g:'cenoura'},outra:{n:'Outra planta',r:3,c:15,g:'broto'}};
+const FER={martelo:{n:'Martelo',g:'martelo'},furadeira:{n:'Furadeira',g:'furadeira'},serra:{n:'Serra',g:'serra'},chave:{n:'Chave',g:'chave'},outra:{n:'Outra ferramenta',g:'chave'}};
+const EST={bom:'Bom',reparo:'Reparo',quebrada:'Quebrada'},EC={bom:'',reparo:'w',quebrada:'p'};
+const CAT={grao:{n:'Grãos',g:'milho',u:'kg'},racao:{n:'Ração',g:'saco',u:'kg'},adubo:{n:'Adubos',g:'adubo',u:'kg'},semente:{n:'Sementes',g:'semente',u:'pacotes'},outro:{n:'Outros',g:'saco',u:'un'}};
+const DEST=['Tanque 1','Tanque 2','Tanque 3','Animais','Horta','Venda','Outro'];
 
 /* ---------- hologramas ---------- */
-const OL='stroke="#0B0620" stroke-width="2.5" stroke-linejoin="round"'.replace('#0B0620','#2B1810');
+const OL='stroke="#2B1810" stroke-width="2.5" stroke-linejoin="round"';
 const GL={
 tomate:`<path d="M30 14v-6" stroke="#6B7F3F" stroke-width="4"/><circle cx="30" cy="32" r="16" fill="#E0574B" ${OL}/><path d="M22 18l8 5 8-5" fill="none" stroke="#6B7F3F" stroke-width="3"/>`,
 alface:`<circle cx="30" cy="32" r="17" fill="#A9B58A" ${OL}/><circle cx="30" cy="32" r="9" fill="#C9D4A8" ${OL}/>`,
 cenoura:`<polygon points="20,24 40,24 30,54" fill="#D9773F" ${OL}/><path d="M30 24l-7-12M30 24v-14M30 24l7-12" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/>`,
-broto:`<path d="M30 52V26" stroke="#6B7F3F" stroke-width="4"/><path d="M30 34C18 34 14 24 14 18c10 0 16 5 16 16z" fill="#A9B58A" ${OL}/><path d="M30 28c0-8 6-13 16-13 0 6-4 13-16 13z" fill="#C9D4A8" ${OL}/>`};
+broto:`<path d="M30 52V26" stroke="#6B7F3F" stroke-width="4"/><path d="M30 34C18 34 14 24 14 18c10 0 16 5 16 16z" fill="#A9B58A" ${OL}/><path d="M30 28c0-8 6-13 16-13 0 6-4 13-16 13z" fill="#C9D4A8" ${OL}/>`,
+martelo:`<rect x="27" y="18" width="6" height="34" rx="2" fill="#8A5A2B" ${OL}/><rect x="14" y="10" width="32" height="14" rx="3" fill="#BDB4A6" ${OL}/>`,
+furadeira:`<rect x="10" y="16" width="34" height="16" rx="4" fill="#E3C98F" ${OL}/><rect x="18" y="32" width="11" height="20" rx="3" fill="#E8A29A" ${OL}/><path d="M44 24h12" stroke="#BDB4A6" stroke-width="4"/>`,
+serra:`<circle cx="30" cy="32" r="20" fill="none" stroke="#BDB4A6" stroke-width="7" stroke-dasharray="5 4"/><circle cx="30" cy="32" r="14" fill="#E6E0D5" ${OL}/><circle cx="30" cy="32" r="4" fill="#2B1810"/>`,
+chave:`<path d="M18 46L42 16" stroke="#BDB4A6" stroke-width="7" stroke-linecap="round"/><circle cx="42" cy="16" r="9" fill="#E6E0D5" ${OL}/>`,
+milho:`<ellipse cx="30" cy="30" rx="10" ry="20" fill="#E3C98F" ${OL}/><path d="M18 52Q30 34 42 52" fill="#A9B58A" ${OL}/>`,
+saco:`<path d="M14 18h32l-2 34H16z" fill="#E9C58A" ${OL}/><rect x="19" y="28" width="22" height="12" fill="#fff" ${OL}/>`,
+adubo:`<path d="M14 18h32l-2 34H16z" fill="#E6E0D5" ${OL}/><rect x="19" y="28" width="22" height="12" fill="#A9B58A" ${OL}/>`,
+semente:`<ellipse cx="22" cy="34" rx="7" ry="11" fill="#8A5A2B" ${OL}/><ellipse cx="38" cy="34" rx="7" ry="11" fill="#E3C98F" ${OL}/><ellipse cx="30" cy="22" rx="6" ry="9" fill="#A9B58A" ${OL}/>`};
 const mini=(g,s=50)=>`<div class="b" style="width:${s+6}px;height:${s+6}px;background:#2B1810"><svg viewBox="0 0 60 60" width="${s}" height="${s}" aria-hidden="true"><ellipse cx="30" cy="55" rx="20" ry="4" fill="#C9A25B" opacity=".5"/>${GL[g]}</svg></div>`;
 const PLOTS=`<polygon points="150,60 188,80 150,100 112,80" fill="#8A5A2B" stroke="#2B1810" stroke-width="3"/><circle cx="150" cy="76" r="7" fill="#E8A29A" stroke="#2B1810" stroke-width="2"/><circle cx="133" cy="82" r="6" fill="#D9773F" stroke="#2B1810" stroke-width="2"/><circle cx="167" cy="82" r="6" fill="#E3C98F" stroke="#2B1810" stroke-width="2"/><path d="M150 76v-14M133 82v-12M167 82v-12" stroke="#6B7F3F" stroke-width="4"/>`;
 const island=(inner,w)=>`<div class="h"><svg viewBox="0 0 300 200" width="${w}" height="${w*2/3}" role="img" aria-label="Holograma flutuante"><defs><linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#C9A25B" stop-opacity=".55"/><stop offset="1" stop-color="#C9A25B" stop-opacity="0"/></linearGradient></defs><polygon points="70,186 230,186 200,100 100,100" fill="url(#bm)"/><ellipse cx="150" cy="186" rx="90" ry="12" fill="#C9A25B" opacity=".4" stroke="#B8893B" stroke-width="2"/><g class="fl"><polygon points="76,98 224,98 150,164" fill="#4A2E20" stroke="#2B1810" stroke-width="3" stroke-linejoin="round"/><polygon points="150,50 232,92 150,134 68,92" fill="#F3EEE4" stroke="#2B1810" stroke-width="3" stroke-linejoin="round"/>${inner}</g></svg></div>`;
-const bigGlyph=g=>`<g transform="translate(110,30) scale(1.3)">${GL[g]}</g>`;
+const big=g=>`<g transform="translate(110,30) scale(1.3)">${GL[g]}</g>`;
 
 /* ---------- estado ---------- */
-let user=null, xp=0, cants=[], view='home', sel=null, unsubs=[], erroDb='';
+let user=null,sid=null,sitio=null,cants=[],fers=[],itens=[],movs=[],view='home',selId=null,cat='todos',q='',unsubs=[],erroDb='';
+const col=n=>collection(db,'sitios',sid,n),dref=(n,id)=>doc(db,'sitios',sid,n,id);
 
-const nextT=(c,t)=>(t==='r'?(c.ultimaRega||c.plantio)+c.regaDias*DAY:(c.ultimaCapina||c.plantio)+c.capinaDias*DAY);
+/* ---------- cálculos ---------- */
+const nextT=(c,t)=>t==='r'?(c.ultimaRega||c.plantio)+c.regaDias*DAY:(c.ultimaCapina||c.plantio)+c.capinaDias*DAY;
 const dias=(c,t)=>Math.round((d0(nextT(c,t))-d0(Date.now()))/DAY);
+const diasV=i=>Math.round((d0(i.validade)-d0(Date.now()))/DAY);
 const quando=d=>d<0?`atrasada ${-d} d`:d===0?'hoje':d===1?'amanhã':`em ${d} dias`;
-const avisos=()=>{const a=[];cants.forEach(c=>{[['r','Regar'],['c','Capinar']].forEach(([t,v])=>{const d=dias(c,t);if(d<=0)a.push({c,t,v,d})})});return a.sort((x,y)=>x.d-y.d)};
-const nivel=()=>({n:Math.floor(xp/1000)+1,p:(xp%1000)/10});
+const baixo=i=>(i.min||0)>0&&i.qtd<=i.min;
+function avisos(){
+  const a=[];
+  cants.forEach(c=>[['r','Regar'],['c','Capinar']].forEach(([t,v])=>{const d=dias(c,t);if(d<=0)a.push({k:'t',o:d,c,t,v})}));
+  itens.forEach(i=>{if(baixo(i))a.push({k:'e',o:-50,i});if(i.validade&&diasV(i)<=7)a.push({k:'v',o:diasV(i)-60,i})});
+  fers.forEach(f=>{if(baixo(f))a.push({k:'f',o:-40,f})});
+  return a.sort((x,y)=>x.o-y.o);
+}
+
+/* ---------- componentes ---------- */
+const rowH=(g,t,m,tag,cls,attr)=>`<button class="c" ${attr} style="text-align:left;font:inherit;color:inherit;cursor:pointer;width:100%"><div class="r">${mini(g)}<div class="f1"><h2>${t}</h2><div class="m">${m}</div></div><span class="t ${cls}">${tag}</span></div></button>`;
+const back=v=>`<div><button class="link" data-go="${v}">‹ Voltar</button></div>`;
+const field=(id,l,inner)=>`<div><label for="${id}">${l}</label>${inner}</div>`;
+const inp=(id,v='',x='')=>`<input class="in" id="${id}" value="${esc(v)}" ${x}>`;
+const selH=(id,opts,cur)=>`<select class="in" id="${id}">${opts.map(([k,l])=>`<option value="${k}"${k===cur?' selected':''}>${esc(l)}</option>`).join('')}</select>`;
+const box=(v,l)=>`<div class="c box"><b>${v}</b><div class="m" style="font-size:11px">${l}</div></div>`;
 
 /* ---------- telas ---------- */
-function vLogin(){return `<div style="height:20px"></div>${island(PLOTS,320)}<div style="text-align:center"><h1 style="font-size:34px">Sítio Bom Jesus</h1><div class="m">Hortas, oficina, paiol e piscicultura em um só lugar</div></div><div style="flex:1"></div><button class="btn" data-act="login" style="background:#fff">Entrar com Google</button><div class="m" style="text-align:center">${esc(erroDb)}</div>`}
+function vLogin(){return `<div style="height:20px"></div>${island(PLOTS,320)}<div style="text-align:center"><h1 style="font-size:34px">Sítio Bom Jesus</h1><div class="m">Hortas, oficina, paiol e piscicultura em um só lugar</div></div><div style="flex:1"></div><button class="btn" data-act="login" style="background:#fff">Entrar com Google</button>`}
 
 function vHome(){
-  const L=nivel(),A=avisos(),nome=esc((user.displayName||'').split(' ')[0]||'');
-  const av=A.length?A.map(a=>`<div class="c"><div class="r">${mini(PRE[a.c.tipo]?.g||'broto',44)}<div class="f1"><h2>${a.v} ${esc(a.c.nome)}</h2><div class="m">${esc(a.c.planta)} · ${quando(a.d)}</div></div><button class="btn sm" data-act="feito" data-id="${a.c.id}" data-t="${a.t}" aria-label="Marcar como feito">Feito</button></div></div>`).join(''):`<div class="c"><div class="m">Nenhum aviso agora. Tudo em dia.</div></div>`;
-  return `<div class="r"><div class="f1"><div class="m">Olá</div><h1>${nome||'Bem-vindo'}</h1></div><button class="link" data-act="logout">Sair</button></div>
-<div class="c"><div class="r"><h2 class="f1">Nível ${L.n} · Sítio em crescimento</h2><span class="t w">${xp} XP</span></div><div class="bar"><i style="width:${L.p}%"></i></div></div>
-<div><h2>Avisos de hoje</h2><div class="m">Ao marcar como feito, o aviso some daqui</div></div>${av}
-<div class="g"><button class="big" data-go="hortas">Hortas<span>${cants.length} canteiro(s)</span></button><button class="big off" data-act="soon">Ferramentaria<span>em breve</span></button><button class="big off" data-act="soon">Paiol<span>em breve</span></button><button class="big off" data-act="soon">Piscicultura<span>em breve</span></button></div>`}
+  const nome=esc((user.displayName||'').split(' ')[0]||'Bem-vindo'),A=avisos();
+  const av=A.length?A.map(a=>{
+    if(a.k==='t')return `<div class="c"><div class="r">${mini(PRE[a.c.tipo]?.g||'broto',44)}<div class="f1"><h2>${a.v} ${esc(a.c.nome)}</h2><div class="m">${esc(a.c.planta)} · ${quando(a.o)}</div></div><button class="btn sm" data-act="feito" data-id="${a.c.id}" data-t="${a.t}" aria-label="Marcar como feito">Feito</button></div></div>`;
+    const x=a.k==='f'?a.f:a.i,g=a.k==='f'?(FER[x.tipo]?.g||'chave'):CAT[x.cat]?.g||'saco';
+    const tit=a.k==='v'?'Vence: '+esc(x.nome):'Repor '+esc(x.nome);
+    const sub=a.k==='v'?(diasV(x)<0?'vencido há '+(-diasV(x))+' d':'vence '+quando(diasV(x))):`${x.qtd} ${esc(x.unidade||'un')} · mínimo ${x.min}`;
+    return `<div class="c"><div class="r">${mini(g,44)}<div class="f1"><h2>${tit}</h2><div class="m">${sub}</div></div><button class="btn sm" data-act="${a.k==='f'?'ofabrir':'paabrir'}" data-id="${x.id}">Ver</button></div></div>`}).join(''):`<div class="c"><div class="m">Nenhum aviso agora. Tudo em dia.</div></div>`;
+  return `<div class="r"><div class="f1"><div class="m">Olá</div><h1>${nome}</h1></div><button class="link" data-act="logout">Sair</button></div>
+<div class="c"><div class="r"><h2 class="f1">${XP_ATIVO?'Sítio em crescimento':'Sítio em preparação'}</h2><span class="t w">${XP_ATIVO?(sitio?.xp||0):0} XP</span></div><div class="bar"><i style="width:${XP_ATIVO?((sitio?.xp||0)%1000)/10:0}%"></i></div>${XP_ATIVO?'':'<div class="m">A contagem de XP começa quando o app for lançado.</div>'}</div>
+<div><h2>Avisos de hoje</h2><div class="m">Ao resolver, o aviso some daqui</div></div>${av}
+<div class="g"><button class="big" data-go="hortas">Hortas<span>${cants.length} canteiro(s)</span></button><button class="big" data-go="oficina">Ferramentaria<span>${fers.length} item(ns)</span></button><button class="big" data-go="paiol">Paiol<span>${itens.length} item(ns)</span></button><button class="big off" data-act="soon">Piscicultura<span>em breve</span></button></div>
+<button class="btn w2" data-act="exportar">Exportar dados (backup)</button>`}
 
+/* Hortas */
 function vHortas(){
-  const rows=cants.map(c=>{const d=Math.min(dias(c,'r'),dias(c,'c')),t=dias(c,'r')<=dias(c,'c')?'Regar':'Capinar';
-    return `<button class="c" data-act="abrir" data-id="${c.id}" style="text-align:left;font:inherit;color:inherit;cursor:pointer"><div class="r">${mini(PRE[c.tipo]?.g||'broto')}<div class="f1"><h2>${esc(c.nome)} · ${esc(c.planta)}</h2><div class="m">Plantio ${fmt(c.plantio)}</div></div><span class="t ${d<0?'p':d===0?'w':''}">${d<=0?t:'Em '+d+' d'}</span></div></button>`}).join('');
+  const rows=cants.map(c=>{const dr=dias(c,'r'),dc=dias(c,'c'),d=Math.min(dr,dc),t=dr<=dc?'Regar':'Capinar';
+    return rowH(PRE[c.tipo]?.g||'broto',`${esc(c.nome)} · ${esc(c.planta)}`,`Plantio ${fmt(c.plantio)}`,d<=0?t:'Em '+d+' d',d<0?'p':d===0?'w':'',`data-act="abrir" data-id="${c.id}"`)}).join('');
   return `<h1>Plantações e Hortas</h1>${island(PLOTS,220)}${rows||'<div class="c"><div class="m">Nenhum canteiro ainda. Cadastre o primeiro.</div></div>'}<button class="btn" data-act="novo">+ Novo canteiro</button>`}
-
-function vNovo(){
-  const hoje=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
-  return `<div class="m"><button class="link" data-go="hortas">‹ Voltar</button></div><h1>Novo canteiro</h1>
-<div><label for="nome">Nome do canteiro</label><input class="in" id="nome" value="Canteiro ${cants.length+1}"></div>
-<div><label for="planta">Planta</label><select class="in" id="planta">${Object.entries(PRE).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('')}</select></div>
-<div id="nomeOutra" hidden><label for="outra">Nome da planta</label><input class="in" id="outra" placeholder="Ex.: couve"></div>
-<div><label for="plantio">Data de plantio</label><input class="in" type="date" id="plantio" value="${hoje}"></div>
-<div class="g"><div><label for="rd">Regar a cada (dias)</label><input class="in" type="number" min="1" id="rd" value="${PRE.tomate.r}"></div><div><label for="cd">Capinar a cada (dias)</label><input class="in" type="number" min="1" id="cd" value="${PRE.tomate.c}"></div></div>
-<div class="m">Os intervalos são valores iniciais de exemplo. Ajuste conforme seu clima e solo.</div><button class="btn" data-act="salvar">Salvar canteiro</button>`}
-
+function vNovo(){return `${back('hortas')}<h1>Novo canteiro</h1>${field('nome','Nome do canteiro',inp('nome','Canteiro '+(cants.length+1)))}${field('planta','Planta',selH('planta',Object.entries(PRE).map(([k,v])=>[k,v.n]),'tomate'))}<div id="nomeOutra" hidden>${field('outra','Nome da planta',inp('outra','','placeholder="Ex.: couve"'))}</div>${field('plantio','Data de plantio',inp('plantio',hojeISO(),'type="date"'))}<div class="g">${field('rd','Regar a cada (dias)',inp('rd',PRE.tomate.r,'type="number" min="1"'))}${field('cd','Capinar a cada (dias)',inp('cd',PRE.tomate.c,'type="number" min="1"'))}</div><div class="m">Os intervalos são valores iniciais de exemplo. Ajuste conforme seu clima e solo.</div><button class="btn" data-act="salvar">Salvar canteiro</button>`}
 function vDetalhe(){
-  const c=cants.find(x=>x.id===sel);if(!c)return vHortas();
-  const g=PRE[c.tipo]?.g||'broto',dr=dias(c,'r'),dc=dias(c,'c');
-  return `<div class="m"><button class="link" data-go="hortas">‹ Voltar</button></div><div class="r"><h1 class="f1">${esc(c.planta)}</h1><span class="t">${esc(c.nome)}</span></div>${island(bigGlyph(g),210)}
-<div class="c"><h2>Regar</h2><div class="m">Última: ${c.ultimaRega?fmt(c.ultimaRega):'ainda não'} · a cada ${c.regaDias} d</div><span class="t ${dr<0?'p':dr===0?'w':''}" style="align-self:flex-start">Próxima: ${quando(dr)} (${fmt(nextT(c,'r'))})</span><button class="btn" data-act="reguei" data-id="${c.id}">Reguei · +20 XP</button></div>
-<div class="c"><h2>Capinar</h2><div class="m">Última: ${c.ultimaCapina?fmt(c.ultimaCapina):'ainda não'} · a cada ${c.capinaDias} d</div><span class="t ${dc<0?'p':dc===0?'w':''}" style="align-self:flex-start">Próxima: ${quando(dc)} (${fmt(nextT(c,'c'))})</span><button class="btn" data-act="capinei" data-id="${c.id}">Capinei · +30 XP</button></div>
+  const c=cants.find(x=>x.id===selId);if(!c)return vHortas();
+  const dr=dias(c,'r'),dc=dias(c,'c');
+  return `${back('hortas')}<div class="r"><h1 class="f1">${esc(c.planta)}</h1><span class="t">${esc(c.nome)}</span></div>${island(big(PRE[c.tipo]?.g||'broto'),210)}
+<div class="c"><h2>Regar</h2><div class="m">Última: ${c.ultimaRega?fmt(c.ultimaRega):'ainda não'} · a cada ${c.regaDias} d</div><span class="t ${dr<0?'p':dr===0?'w':''}" style="align-self:flex-start">Próxima: ${quando(dr)} (${fmt(nextT(c,'r'))})</span><button class="btn" data-act="reguei" data-id="${c.id}">Reguei${xpTxt(20)}</button></div>
+<div class="c"><h2>Capinar</h2><div class="m">Última: ${c.ultimaCapina?fmt(c.ultimaCapina):'ainda não'} · a cada ${c.capinaDias} d</div><span class="t ${dc<0?'p':dc===0?'w':''}" style="align-self:flex-start">Próxima: ${quando(dc)} (${fmt(nextT(c,'c'))})</span><button class="btn" data-act="capinei" data-id="${c.id}">Capinei${xpTxt(30)}</button></div>
 <div class="m" style="text-align:center">Plantado em ${fmt(c.plantio)}</div><button class="btn w2" data-act="excluir" data-id="${c.id}">Excluir canteiro</button>`}
 
+/* Oficina */
+const filtraF=()=>fers.filter(f=>!q||(f.nome+' '+(f.local||'')).toLowerCase().includes(q.toLowerCase())).sort((a,b)=>a.nome.localeCompare(b.nome));
+const listaOf=()=>filtraF().map(f=>rowH(FER[f.tipo]?.g||'chave',esc(f.nome),`${esc(f.local||'sem local')} · qtd ${f.qtd}${f.emprestada?' · com '+esc(f.emprestada.com):''}`,f.emprestada?'Emprestada':EST[f.estado],f.emprestada?'w':EC[f.estado],`data-act="ofabrir" data-id="${f.id}"`)).join('')||'<div class="c"><div class="m">Nenhuma ferramenta encontrada.</div></div>';
+function vOficina(){return `<h1>Ferramentaria e Oficina</h1>${island(big('martelo'),190)}<input class="in" id="busca" placeholder="Buscar ferramenta" value="${esc(q)}"><div id="lista" style="display:flex;flex-direction:column;gap:12px">${listaOf()}</div><button class="btn" data-act="ofnovo">+ Nova ferramenta</button>`}
+function vOfNovo(){return `${back('oficina')}<h1>Nova ferramenta</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Furadeira de impacto"'))}${field('tipo','Tipo',selH('tipo',Object.entries(FER).map(([k,v])=>[k,v.n]),'martelo'))}<div class="g">${field('qtd','Quantidade',inp('qtd',1,'type="number" min="0"'))}${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0"'))}</div>${field('local','Local',inp('local','','placeholder="Ex.: Prateleira B"'))}${field('estado','Estado',selH('estado',Object.entries(EST),'bom'))}<button class="btn" data-act="ofsalvar">Salvar ferramenta</button>`}
+function vOfDet(){
+  const f=fers.find(x=>x.id===selId);if(!f)return vOficina();
+  return `${back('oficina')}<div class="r"><h1 class="f1">${esc(f.nome)}</h1><span class="t ${EC[f.estado]}">${EST[f.estado]}</span></div>${island(big(FER[f.tipo]?.g||'chave'),190)}
+<div class="c"><h2>Quantidade</h2><div class="r"><button class="btn sm" data-act="qmenos" data-id="${f.id}" aria-label="Diminuir">−</button><div class="f1" style="text-align:center;font-size:22px;font-weight:800">${f.qtd}</div><button class="btn sm" data-act="qmais" data-id="${f.id}" aria-label="Aumentar">+</button></div><div class="m">Local: ${esc(f.local||'não informado')}${f.min?' · avisar abaixo de '+f.min:''}</div></div>
+${field('estado','Estado',selH('estado',Object.entries(EST),f.estado))}
+<div class="c"><h2>Empréstimo</h2>${f.emprestada?`<div class="m">Com ${esc(f.emprestada.com)} desde ${fmt(f.emprestada.desde)}</div><button class="btn" data-act="devolveu" data-id="${f.id}">Foi devolvida</button>`:`<div class="m">Disponível na oficina</div><button class="btn" data-act="emprestar" data-id="${f.id}">Emprestar</button>`}</div>
+<button class="btn w2" data-act="ofexcluir" data-id="${f.id}">Excluir ferramenta</button>`}
+
+/* Paiol */
+const filtraP=()=>itens.filter(i=>cat==='todos'||i.cat===cat).sort((a,b)=>a.nome.localeCompare(b.nome));
+function vPaiol(){
+  const h=d0(Date.now()),ent=movs.filter(m=>m.tipo==='entrada'&&d0(m.em)===h).length,sai=movs.filter(m=>m.tipo==='saida'&&d0(m.em)===h).length,venc=itens.filter(i=>i.validade&&diasV(i)<=30).length;
+  const rows=filtraP().map(i=>{const dv=i.validade?diasV(i):null;
+    return rowH(CAT[i.cat]?.g||'saco',esc(i.nome),i.validade?`Validade ${fmt(i.validade)}${dv<=30?' · '+(dv<0?'vencido':quando(dv)):''}`:'Sem validade',baixo(i)?'Baixo · '+i.qtd+' '+esc(i.unidade):i.qtd+' '+esc(i.unidade),baixo(i)||(dv!==null&&dv<0)?'p':'',`data-act="paabrir" data-id="${i.id}"`)}).join('');
+  return `<h1>Paiol</h1>${island(big('saco'),170)}<div class="r">${box(ent,'Entradas hoje')}${box(sai,'Saídas hoje')}${box(venc,'Vencem em 30 d')}</div>
+<div class="chips">${[['todos','Todos'],...Object.entries(CAT).map(([k,v])=>[k,v.n])].map(([k,l])=>`<button class="chip ${cat===k?'on':''}" data-act="cat" data-id="${k}">${l}</button>`).join('')}</div>${rows||'<div class="c"><div class="m">Nenhum item nesta categoria.</div></div>'}<button class="btn" data-act="panovo">+ Novo item</button>`}
+function vPaNovo(){return `${back('paiol')}<h1>Novo item do paiol</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Ração tilápia"'))}${field('cat','Categoria',selH('cat',Object.entries(CAT).map(([k,v])=>[k,v.n]),'grao'))}<div class="g">${field('unidade','Unidade',inp('unidade','kg'))}${field('qtd','Quantidade inicial',inp('qtd',0,'type="number" min="0" step="any"'))}</div><div class="g">${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0" step="any"'))}${field('validade','Validade (opcional)',inp('validade','','type="date"'))}</div><button class="btn" data-act="pasalvar">Salvar item</button>`}
+function vPaDet(){
+  const i=itens.find(x=>x.id===selId);if(!i)return vPaiol();
+  const hist=movs.filter(m=>m.itemId===i.id).slice(0,6).map(m=>`<div class="m">${fmt(m.em)} · ${m.tipo==='entrada'?'entrada':'saída'} ${m.qtd} ${esc(m.unidade)}${m.destino?' · '+esc(m.destino):''}</div>`).join('')||'<div class="m">Sem movimentos ainda.</div>';
+  return `${back('paiol')}<div class="r"><h1 class="f1">${esc(i.nome)}</h1><span class="t ${baixo(i)?'p':''}">${i.qtd} ${esc(i.unidade)}</span></div>${island(big(CAT[i.cat]?.g||'saco'),170)}
+<div class="c"><div class="m">${CAT[i.cat]?.n||'Outros'}${i.min?' · avisar abaixo de '+i.min+' '+esc(i.unidade):''}${i.validade?' · validade '+fmt(i.validade):''}</div></div>
+<div class="c"><h2>Registrar movimento</h2><div class="g">${field('mq','Quantidade',inp('mq','','type="number" min="0" step="any" placeholder="0"'))}${field('md','Destino ou origem',selH('md',DEST.map(d=>[d,d]),'Tanque 1'))}</div><div class="g"><button class="btn" data-act="entrada" data-id="${i.id}">+ Entrada</button><button class="btn w2" data-act="saida" data-id="${i.id}">− Saída</button></div></div>
+<div class="c"><h2>Histórico</h2>${hist}</div><button class="btn w2" data-act="paexcluir" data-id="${i.id}">Excluir item</button>`}
+
+/* ---------- render ---------- */
+const VIEWS={home:vHome,hortas:vHortas,novo:vNovo,detalhe:vDetalhe,oficina:vOficina,ofnovo:vOfNovo,ofdet:vOfDet,paiol:vPaiol,panovo:vPaNovo,padet:vPaDet};
+const AREA={home:'home',hortas:'hortas',novo:'hortas',detalhe:'hortas',oficina:'oficina',ofnovo:'oficina',ofdet:'oficina',paiol:'paiol',panovo:'paiol',padet:'paiol'};
 function render(){
   const app=$('#app'),nav=$('#nav');
   if(!user){nav.hidden=true;app.innerHTML=vLogin();return}
-  app.innerHTML=({home:vHome,hortas:vHortas,novo:vNovo,detalhe:vDetalhe})[view]();
-  nav.hidden=false;
-  const on=view==='home'?'home':'hortas';
-  nav.innerHTML=[['home','Início'],['hortas','Hortas']].map(([k,l])=>`<button class="${on===k?'on':''}" data-go="${k}">${l}</button>`).join('')+['Oficina','Paiol','Peixes'].map(l=>`<button class="off" data-act="soon">${l}</button>`).join('');
+  if(!sid){nav.hidden=true;app.innerHTML=`<div class="c" style="margin-top:40vh"><div class="m" style="text-align:center">${esc(erroDb)||'Carregando seu sítio…'}</div></div>`;return}
+  app.innerHTML=VIEWS[view]();
+  nav.hidden=false;const on=AREA[view];
+  nav.innerHTML=[['home','Início'],['hortas','Hortas'],['oficina','Oficina'],['paiol','Paiol']].map(([k,l])=>`<button class="${on===k?'on':''}" data-go="${k}">${l}</button>`).join('')+`<button class="off" data-act="soon">Peixes</button>`;
 }
+const typing=()=>/INPUT|SELECT|TEXTAREA/.test(document.activeElement?.tagName||'');
+const refresh=()=>{if(!typing())render()};
 
 /* ---------- ações ---------- */
-const uref=p=>doc(db,'users',user.uid,...p);
-const ganhar=n=>setDoc(doc(db,'users',user.uid),{xp:increment(n)},{merge:true});
+const ganhar=n=>XP_ATIVO?updateDoc(doc(db,'sitios',sid),{xp:increment(n)}):null;
+const num=id=>parseFloat(String(val(id)).replace(',','.'));
 document.addEventListener('click',async e=>{
   const g=e.target.closest('[data-go]');if(g){view=g.dataset.go;render();scrollTo(0,0);return}
   const el=e.target.closest('[data-act]');if(!el)return;
   const a=el.dataset.act,id=el.dataset.id;
   try{
-    if(a==='login'){await signInWithPopup(auth,new GoogleAuthProvider())}
-    else if(a==='logout'){await signOut(auth)}
-    else if(a==='soon'){toast('Essa área chega nas próximas etapas')}
+    if(a==='login')await signInWithPopup(auth,new GoogleAuthProvider());
+    else if(a==='logout')await signOut(auth);
+    else if(a==='soon')toast('Essa área chega nas próximas etapas');
+    else if(a==='exportar')exportar();
+    else if(a==='cat'){cat=id;render()}
     else if(a==='novo'){view='novo';render()}
-    else if(a==='abrir'){sel=id;view='detalhe';render();scrollTo(0,0)}
+    else if(a==='abrir'){selId=id;view='detalhe';render();scrollTo(0,0)}
     else if(a==='salvar'){
-      const k=$('#planta').value,rd=+$('#rd').value,cd=+$('#cd').value,pl=$('#plantio').value;
-      if(!pl||rd<1||cd<1){toast('Confira a data e os intervalos');return}
-      const nome=$('#nome').value.trim()||'Canteiro';
-      const planta=k==='outra'?($('#outra').value.trim()||'Outra planta'):PRE[k].n;
+      const k=val('planta'),rd=num('rd'),cd=num('cd'),pl=val('plantio');
+      if(!pl||!(rd>=1)||!(cd>=1)){toast('Confira a data e os intervalos');return}
       el.disabled=true;
-      await addDoc(collection(db,'users',user.uid,'canteiros'),{nome,tipo:k,planta,plantio:new Date(pl+'T00:00:00').getTime(),regaDias:rd,capinaDias:cd,criadoEm:Date.now()});
+      await addDoc(col('canteiros'),{nome:val('nome').trim()||'Canteiro',tipo:k,planta:k==='outra'?(val('outra').trim()||'Outra planta'):PRE[k].n,plantio:new Date(pl+'T00:00:00').getTime(),regaDias:rd,capinaDias:cd,criadoEm:Date.now()});
       view='hortas';render();toast('Canteiro salvo')}
-    else if(a==='reguei'){await updateDoc(uref(['canteiros',id]),{ultimaRega:Date.now()});await ganhar(20);toast('Rega registrada · +20 XP')}
-    else if(a==='capinei'){await updateDoc(uref(['canteiros',id]),{ultimaCapina:Date.now()});await ganhar(30);toast('Capina registrada · +30 XP')}
-    else if(a==='feito'){const t=el.dataset.t;await updateDoc(uref(['canteiros',id]),t==='r'?{ultimaRega:Date.now()}:{ultimaCapina:Date.now()});await ganhar(t==='r'?20:30);toast('Feito! +'+(t==='r'?20:30)+' XP')}
-    else if(a==='excluir'){if(confirm('Excluir este canteiro?')){await deleteDoc(uref(['canteiros',id]));view='hortas';render()}}
+    else if(a==='reguei'){await updateDoc(dref('canteiros',id),{ultimaRega:Date.now()});await ganhar(20);toast('Rega registrada')}
+    else if(a==='capinei'){await updateDoc(dref('canteiros',id),{ultimaCapina:Date.now()});await ganhar(30);toast('Capina registrada')}
+    else if(a==='feito'){const t=el.dataset.t;await updateDoc(dref('canteiros',id),t==='r'?{ultimaRega:Date.now()}:{ultimaCapina:Date.now()});await ganhar(t==='r'?20:30);toast('Feito!')}
+    else if(a==='excluir'){if(confirm('Excluir este canteiro?')){await deleteDoc(dref('canteiros',id));view='hortas';render()}}
+    /* oficina */
+    else if(a==='ofnovo'){view='ofnovo';render()}
+    else if(a==='ofabrir'){selId=id;view='ofdet';render();scrollTo(0,0)}
+    else if(a==='ofsalvar'){
+      const nome=val('nome').trim(),qtd=num('qtd'),min=num('min')||0;
+      if(!nome||!(qtd>=0)){toast('Informe o nome e a quantidade');return}
+      el.disabled=true;
+      await addDoc(col('ferramentas'),{nome,tipo:val('tipo'),qtd,min,local:val('local').trim(),estado:val('estado'),emprestada:null,criadoEm:Date.now()});
+      view='oficina';render();toast('Ferramenta salva')}
+    else if(a==='qmais'||a==='qmenos'){await updateDoc(dref('ferramentas',id),{qtd:increment(a==='qmais'?1:-1)})}
+    else if(a==='emprestar'){const com=(prompt('Quem pegou a ferramenta?')||'').trim();if(com)await updateDoc(dref('ferramentas',id),{emprestada:{com,desde:Date.now()}})}
+    else if(a==='devolveu'){await updateDoc(dref('ferramentas',id),{emprestada:null});toast('Devolvida')}
+    else if(a==='ofexcluir'){if(confirm('Excluir esta ferramenta?')){await deleteDoc(dref('ferramentas',id));view='oficina';render()}}
+    /* paiol */
+    else if(a==='panovo'){view='panovo';render()}
+    else if(a==='paabrir'){selId=id;view='padet';render();scrollTo(0,0)}
+    else if(a==='pasalvar'){
+      const nome=val('nome').trim(),qtd=num('qtd'),min=num('min')||0,v=val('validade');
+      if(!nome||!(qtd>=0)){toast('Informe o nome e a quantidade');return}
+      el.disabled=true;
+      await addDoc(col('itens'),{nome,cat:val('cat'),unidade:val('unidade').trim()||'un',qtd,min,validade:v?new Date(v+'T00:00:00').getTime():null,criadoEm:Date.now()});
+      view='paiol';render();toast('Item salvo')}
+    else if(a==='entrada'||a==='saida'){
+      const i=itens.find(x=>x.id===id),n=num('mq');
+      if(!(n>0)){toast('Informe a quantidade');return}
+      if(a==='saida'&&n>i.qtd){toast('Estoque insuficiente');return}
+      const b=writeBatch(db);
+      b.update(dref('itens',id),{qtd:increment(a==='entrada'?n:-n)});
+      b.set(doc(col('movimentos')),{itemId:id,nome:i.nome,tipo:a,qtd:n,unidade:i.unidade,destino:val('md'),em:Date.now()});
+      await b.commit();toast(a==='entrada'?'Entrada registrada':'Saída registrada')}
+    else if(a==='paexcluir'){if(confirm('Excluir este item? O histórico dele continua nos backups.')){await deleteDoc(dref('itens',id));view='paiol';render()}}
   }catch(err){console.error(err);toast('Algo deu errado: '+(err.code||err.message))}
 });
-document.addEventListener('change',e=>{
-  if(e.target.id==='planta'){const p=PRE[e.target.value];$('#rd').value=p.r;$('#cd').value=p.c;$('#nomeOutra').hidden=e.target.value!=='outra'}
+document.addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.id==='planta'){const p=PRE[t.value];$('#rd').value=p.r;$('#cd').value=p.c;$('#nomeOutra').hidden=t.value!=='outra'}
+  else if(t.id==='cat'&&view==='panovo'){$('#unidade').value=CAT[t.value].u}
+  else if(t.id==='estado'&&view==='ofdet'){try{await updateDoc(dref('ferramentas',selId),{estado:t.value})}catch(err){toast('Erro: '+(err.code||err.message))}}
 });
+document.addEventListener('input',e=>{if(e.target.id==='busca'){q=e.target.value;$('#lista').innerHTML=listaOf()}});
+
+/* ---------- backup ---------- */
+function exportar(){
+  const dados={exportadoEm:new Date().toISOString(),sitio,canteiros:cants,ferramentas:fers,itens,movimentos:movs};
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(dados,null,1)],{type:'application/json'}));
+  a.download='sitio-backup-'+hojeISO()+'.json';document.body.appendChild(a);a.click();a.remove();toast('Backup baixado');
+}
 
 /* ---------- login e dados ---------- */
-const refresh=()=>{if(view!=='novo')render()};
-onAuthStateChanged(auth,u=>{
-  unsubs.forEach(f=>f());unsubs=[];user=u;cants=[];xp=0;erroDb='';
-  if(u){
-    const falha=err=>{erroDb='Não consegui acessar o banco. Verifique se o Firestore foi criado e as regras publicadas.';console.error(err);toast('Erro no banco de dados');render()};
-    unsubs.push(onSnapshot(collection(db,'users',u.uid,'canteiros'),s=>{cants=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.criadoEm-b.criadoEm);refresh()},falha));
-    unsubs.push(onSnapshot(doc(db,'users',u.uid),s=>{xp=s.data()?.xp||0;refresh()},falha));
-  }
-  view='home';render();
+function falha(err){erroDb='Não consegui acessar o banco. Verifique se o Firestore foi criado e as regras publicadas.';console.error(err);toast('Erro no banco de dados');render()}
+onAuthStateChanged(auth,async u=>{
+  unsubs.forEach(f=>f());unsubs=[];user=u;sid=null;sitio=null;cants=[];fers=[];itens=[];movs=[];erroDb='';view='home';render();
+  if(!u)return;
+  try{
+    const uref=doc(db,'users',u.uid);let id=(await getDoc(uref)).data()?.sitioId;
+    if(!id){
+      /* primeira vez: limpa dados de teste antigos e cria o sítio */
+      const velhos=await getDocs(collection(db,'users',u.uid,'canteiros'));await Promise.all(velhos.docs.map(d=>deleteDoc(d.ref)));
+      const r=await addDoc(collection(db,'sitios'),{nome:'Sítio Bom Jesus',donoUid:u.uid,memberUids:[u.uid],xp:0,criadoEm:Date.now()});
+      await setDoc(uref,{sitioId:r.id},{merge:true});id=r.id;
+    }
+    sid=id;
+    const sub=(n,set,ref)=>onSnapshot(ref||col(n),s=>{set(s.docs.map(d=>({id:d.id,...d.data()})));refresh()},falha);
+    unsubs.push(onSnapshot(doc(db,'sitios',sid),s=>{sitio=s.data();refresh()},falha));
+    unsubs.push(sub('canteiros',a=>cants=a.sort((x,y)=>x.criadoEm-y.criadoEm)));
+    unsubs.push(sub('ferramentas',a=>fers=a));
+    unsubs.push(sub('itens',a=>itens=a));
+    unsubs.push(sub('movimentos',a=>movs=a,query(col('movimentos'),orderBy('em','desc'),limit(200))));
+    render();
+  }catch(err){falha(err)}
 });
 render();
 </script>
