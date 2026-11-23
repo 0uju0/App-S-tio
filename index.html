@@ -50,8 +50,9 @@ nav button.on{color:#1F3B2B;font-weight:700;border-bottom-color:#4F8A4B}nav butt
 <div id="app"></div><nav id="nav" hidden></nav><div id="toast" role="status"></div>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {arrayUnion,where,getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,getDoc,getDocs,increment,writeBatch,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,deleteUser,reauthenticateWithPopup,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import {initializeAppCheck,ReCaptchaV3Provider} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app-check.js";
+import {arrayUnion,terminate,clearIndexedDbPersistence,where,getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,getDoc,getDocs,increment,writeBatch,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDnFinb5lTgHk0MiZ1Lo6OorqdezcKo4Cc",
@@ -63,6 +64,9 @@ const firebaseConfig = {
   appId: "1:55293786879:web:32c4f9d453927074f5eaca"
 };
 const fb=initializeApp(firebaseConfig), auth=getAuth(fb);
+/* App Check: cole aqui a chave do reCAPTCHA v3 (veja o guia de publicação). Vazio = desligado. */
+const APPCHECK_KEY='';
+if(APPCHECK_KEY){try{initializeAppCheck(fb,{provider:new ReCaptchaV3Provider(APPCHECK_KEY),isTokenAutoRefreshEnabled:true})}catch(e){console.error(e)}}
 setPersistence(auth,browserLocalPersistence).catch(()=>{});
 let db;try{db=initializeFirestore(fb,{localCache:persistentLocalCache({tabManager:persistentMultipleTabManager()})})}catch(e){db=getFirestore(fb)}
 
@@ -329,6 +333,11 @@ const splash=m=>`<div style="flex:1;display:flex;flex-direction:column;justify-c
 let convRec=[],convEnv=[],lancs=[],funcs=[],pres=[],resumos=[],finPer='sem',funcSel=null,resSel=null,finOk=false,resOk=false,tanques=[],equips=[],meds=[],manejos=[],tqSel=null,rels=[],conf={},relSel=null,props=[],user=null,sid=null,sitio=null,cants=[],fers=[],itens=[],movs=[],view='home',selId=null,cat='todos',q='',unsubs=[],erroDb='';
 let authReady=false;
 const col=n=>collection(db,'sitios',sid,n),dref=(n,id)=>doc(db,'sitios',sid,n,id);
+const meuPapel=()=>!sitio||!user?'gestor':sitio.donoUid===user.uid?'dono':(sitio.membrosInfo?.[user.uid]?.papel||'gestor');
+const podeFin=()=>meuPapel()!=='funcionario';
+const PAPEL={dono:'dono',gestor:'gestor',funcionario:'funcionário'};
+const FINV=['fin','finnovo','funcs','funcnovo','funcdet','finres','finresdet','lote'];
+const SUBS=['canteiros','ferramentas','itens','movimentos','conferencias','hologramas','tanques','equipamentos','medicoes','manejos','lancamentos','funcionarios','presencas','resumos'];
 
 /* ---------- cálculos ---------- */
 const nextT=(c,t)=>t==='r'?(c.ultimaRega||c.plantio)+c.regaDias*DAY:(c.ultimaCapina||c.plantio)+c.capinaDias*DAY;
@@ -354,7 +363,7 @@ const selH=(id,opts,cur)=>`<select class="in" id="${id}">${opts.map(([k,l])=>`<o
 const box=(v,l)=>`<div class="c box"><b>${v}</b><div class="m" style="font-size:11px">${l}</div></div>`;
 
 /* ---------- telas ---------- */
-function vLogin(){return `<div style="height:20px"></div>${island(PLOTS,320)}<div style="text-align:center"><h1 style="font-size:34px">${esc(APP_NOME)}</h1><div class="m">Hortas, oficina, paiol e piscicultura em um só lugar</div></div><div style="flex:1"></div><button class="btn" data-act="login" style="background:#fff">Entrar com Google</button>`}
+function vLogin(){return `<div style="height:20px"></div>${island(PLOTS,320)}<div style="text-align:center"><h1 style="font-size:34px">${esc(APP_NOME)}</h1><div class="m">Hortas, oficina, paiol e piscicultura em um só lugar</div></div><div style="flex:1"></div><button class="btn" data-act="login" style="background:#fff">Entrar com Google</button><div class="m" style="text-align:center">Ao entrar, você concorda com os <a href="termos.html" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="privacidade.html" target="_blank" rel="noopener">Política de Privacidade</a>.</div>`}
 
 function vHome(){
   const nome=esc((user.displayName||'').split(' ')[0]||'Bem-vindo'),A=avisos();
@@ -366,11 +375,11 @@ function vHome(){
     const sub=a.k==='v'?(diasV(x)<0?'vencido há '+(-diasV(x))+' d':'vence '+quando(diasV(x))):`${x.qtd} ${esc(x.unidade||'un')} · mínimo ${x.min}`;
     return `<div class="c"><div class="r">${mini(g,44)}<div class="f1"><h2>${tit}</h2><div class="m">${sub}</div></div><button class="btn sm" data-act="${a.k==='f'?'ofabrir':'paabrir'}" data-id="${x.id}">Ver</button></div></div>`}).join(''):`<div class="c"><div class="m">Nenhum aviso agora. Tudo em dia.</div></div>`;
   return `<div class="r"><div class="f1"><div class="m">Olá</div><h1>${nome}</h1><button class="link" data-go="props" style="text-align:left">${esc(sitio?.nome||'Minhas propriedades')} ▾</button></div><button data-go="perfil" aria-label="Meu perfil" style="background:none;border:0;padding:0;cursor:pointer">${avatar(48)}</button></div>
-${cardConv()}${banCrit()}${cardResumo()}<div class="c"><div class="r"><h2 class="f1">${XP_ATIVO?'Sítio em crescimento':'Sítio em preparação'}</h2><span class="t w">${XP_ATIVO?(sitio?.xp||0):0} XP</span></div><div class="bar"><i style="width:${XP_ATIVO?((sitio?.xp||0)%1000)/10:0}%"></i></div>${XP_ATIVO?'':'<div class="m">A contagem de XP começa quando o app for lançado.</div>'}</div>
+${cardConv()}${banCrit()}${cardBackup()}${cardResumo()}<div class="c"><div class="r"><h2 class="f1">${XP_ATIVO?'Sítio em crescimento':'Sítio em preparação'}</h2><span class="t w">${XP_ATIVO?(sitio?.xp||0):0} XP</span></div><div class="bar"><i style="width:${XP_ATIVO?((sitio?.xp||0)%1000)/10:0}%"></i></div>${XP_ATIVO?'':'<div class="m">A contagem de XP começa quando o app for lançado.</div>'}</div>
 <div><h2>Avisos de hoje</h2><div class="m">Ao resolver, o aviso some daqui</div></div>${av}
 <div class="g"><button class="big" data-go="hortas">${mini('tomate',30)}<div>Hortas<span>${cants.length} canteiro(s)</span></div></button><button class="big" data-go="oficina">${mini('martelo',30)}<div>Ferramentaria<span>${fers.length} item(ns)</span></div></button><button class="big" data-go="paiol">${mini('saco',30)}<div>Paiol<span>${itens.length} item(ns)</span></div></button><button class="big" data-go="peixes">${mini('peixe',30)}<div>Piscicultura<span>${tqAtivos().length} tanque(s)</span></div></button></div>
-<button class="big" data-go="fin" style="min-height:84px;flex-direction:row;align-items:center;justify-content:flex-start">${mini('moeda',30)}<div>Financeiro<span>${fmtR(somaT(lancIn(...periodo('sem')),'gasto'))} gastos na semana</span></div></button>
-<button class="btn w2" data-act="exportar">Exportar dados (backup)</button>`}
+${podeFin()?`<button class="big" data-go="fin" style="min-height:84px;flex-direction:row;align-items:center;justify-content:flex-start">${mini('moeda',30)}<div>Financeiro<span>${fmtR(somaT(lancIn(...periodo('sem')),'gasto'))} gastos na semana</span></div></button>
+<button class="btn w2" data-act="exportar">Exportar dados (backup)</button>`:''}`}
 
 /* Hortas */
 function vHortas(){
@@ -391,7 +400,7 @@ const filtraF=()=>fers.filter(f=>!q||(f.nome+' '+(f.local||'')).toLowerCase().in
 const listaOf=()=>filtraF().map(f=>rowH(H(f.nome,'ferramenta'),esc(f.nome),`${esc(f.local||'sem local')} · qtd ${f.qtd}${f.emprestada?' · com '+esc(f.emprestada.com):''}`,f.emprestada?'Emprestada':EST[f.estado],f.emprestada?'w':EC[f.estado],`data-act="ofabrir" data-id="${f.id}"`)).join('')||'<div class="c"><div class="m">Nenhuma ferramenta encontrada.</div></div>';
 const tabsOf=a=>`<div class="tabs" role="tablist">${[['oficina','Ferramentas'],['conf','Conferência'],['rels','Relatórios']].map(([v,l])=>`<button role="tab" aria-selected="${a===v}" class="tab ${a===v?'on':''}" data-go="${v}">${l}</button>`).join('')}</div>`;
 function vOficina(){return `<h1>Ferramentaria e Oficina</h1>${tabsOf('oficina')}${island(big('martelo'),190)}<input class="in" id="busca" placeholder="Buscar ferramenta" value="${esc(q)}"><div id="lista" style="display:flex;flex-direction:column;gap:12px">${listaOf()}</div><button class="btn" data-act="ofnovo">+ Nova ferramenta</button>`}
-function vOfNovo(){return `${back('oficina')}<h1>Nova ferramenta</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Furadeira de impacto"'))}<div id="prev" class="r"></div><div class="g">${field('qtd','Quantidade',inp('qtd',1,'type="number" min="0"'))}${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0"'))}</div>${field('local','Local',inp('local','','placeholder="Ex.: Prateleira B"'))}${field('estado','Estado',selH('estado',Object.entries(EST),'bom'))}${field('pv','Valor pago (R$, opcional)',inp('pv','','type="number" min="0" step="any" inputmode="decimal"'))}<button class="btn" data-act="ofsalvar">Salvar ferramenta</button>`}
+function vOfNovo(){return `${back('oficina')}<h1>Nova ferramenta</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Furadeira de impacto"'))}<div id="prev" class="r"></div><div class="g">${field('qtd','Quantidade',inp('qtd',1,'type="number" min="0"'))}${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0"'))}</div>${field('local','Local',inp('local','','placeholder="Ex.: Prateleira B"'))}${field('estado','Estado',selH('estado',Object.entries(EST),'bom'))}${podeFin()?field('pv','Valor pago (R$, opcional)',inp('pv','','type="number" min="0" step="any" inputmode="decimal"')):''}<button class="btn" data-act="ofsalvar">Salvar ferramenta</button>`}
 function vOfDet(){
   const f=fers.find(x=>x.id===selId);if(!f)return vOficina();
   return `${back('oficina')}<div class="r"><h1 class="f1">${esc(f.nome)}</h1><span class="t ${EC[f.estado]}">${EST[f.estado]}</span></div>${island(big(H(f.nome,'ferramenta')),190)}
@@ -408,13 +417,13 @@ function vPaiol(){
     return rowH(H(i.nome,'insumo'),esc(i.nome),i.validade?`Validade ${fmt(i.validade)}${dv<=30?' · '+(dv<0?'vencido':quando(dv)):''}`:'Sem validade',baixo(i)?'Baixo · '+i.qtd+' '+esc(i.unidade):i.qtd+' '+esc(i.unidade),baixo(i)||(dv!==null&&dv<0)?'p':'',`data-act="paabrir" data-id="${i.id}"`)}).join('');
   return `<h1>Paiol</h1>${island(big('saco'),170)}<div class="r">${box(ent,'Reposições hoje')}${box(sai,'Saídas hoje')}${box(venc,'Vencem em 30 d')}</div>
 <div class="chips">${[['todos','Todos'],...Object.entries(CAT).map(([k,v])=>[k,v.n])].map(([k,l])=>`<button class="chip ${cat===k?'on':''}" data-act="cat" data-id="${k}">${l}</button>`).join('')}</div>${rows||'<div class="c"><div class="m">Nenhum item nesta categoria.</div></div>'}<button class="btn" data-act="panovo">+ Novo item</button>`}
-function vPaNovo(){return `${back('paiol')}<h1>Novo item do paiol</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Ração tilápia"'))}<div id="prev" class="r"></div>${field('cat','Categoria',selH('cat',Object.entries(CAT).map(([k,v])=>[k,v.n]),'grao'))}<div class="g">${field('unidade','Unidade',inp('unidade','kg'))}${field('qtd','Quantidade inicial',inp('qtd',0,'type="number" min="0" step="any"'))}</div>${field('pv','Valor pago (R$, opcional)',inp('pv','','type="number" min="0" step="any" inputmode="decimal"'))}<div class="g">${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0" step="any"'))}${field('validade','Validade (opcional)',inp('validade','','type="date"'))}</div><button class="btn" data-act="pasalvar">Salvar item</button>`}
+function vPaNovo(){return `${back('paiol')}<h1>Novo item do paiol</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Ração tilápia"'))}<div id="prev" class="r"></div>${field('cat','Categoria',selH('cat',Object.entries(CAT).map(([k,v])=>[k,v.n]),'grao'))}<div class="g">${field('unidade','Unidade',inp('unidade','kg'))}${field('qtd','Quantidade inicial',inp('qtd',0,'type="number" min="0" step="any"'))}</div>${podeFin()?field('pv','Valor pago (R$, opcional)',inp('pv','','type="number" min="0" step="any" inputmode="decimal"')):''}<div class="g">${field('min','Avisar abaixo de',inp('min',0,'type="number" min="0" step="any"'))}${field('validade','Validade (opcional)',inp('validade','','type="date"'))}</div><button class="btn" data-act="pasalvar">Salvar item</button>`}
 function vPaDet(){
   const i=itens.find(x=>x.id===selId);if(!i)return vPaiol();
   const hist=movs.filter(m=>m.itemId===i.id).slice(0,6).map(m=>`<div class="m">${fmt(m.em)} · ${m.tipo==='entrada'?'reposição':'saída'} ${m.qtd} ${esc(m.unidade)}${m.destino?' · '+esc(m.destino):''}${m.valor>0?' · '+fmtR(m.valor):''}</div>`).join('')||'<div class="m">Sem movimentos ainda.</div>';
   return `${back('paiol')}<div class="r"><h1 class="f1">${esc(i.nome)}</h1><span class="t ${baixo(i)?'p':''}">${i.qtd} ${esc(i.unidade)}</span></div>${island(big(H(i.nome,'insumo')),170)}
 <div class="c"><div class="m">${CAT[i.cat]?.n||'Outros'}${i.min?' · avisar abaixo de '+i.min+' '+esc(i.unidade):''}${i.validade?' · validade '+fmt(i.validade):''}</div></div>
-<div class="c"><h2>Repor estoque</h2><div class="m">A reposição entra direto neste item.</div><div class="g">${inp('rq','','type="number" min="0" step="any" placeholder="Quantidade"')}${inp('rv','','type="number" min="0" step="any" inputmode="decimal" placeholder="Valor gasto (R$)"')}</div><button class="btn w2" data-act="entrada" data-id="${i.id}">+ Repor</button><div class="m">O valor é opcional e vai para o Financeiro.</div></div>
+<div class="c"><h2>Repor estoque</h2><div class="m">A reposição entra direto neste item.</div><div class="g">${inp('rq','','type="number" min="0" step="any" placeholder="Quantidade"')}${podeFin()?inp('rv','','type="number" min="0" step="any" inputmode="decimal" placeholder="Valor gasto (R$)"'):''}</div><button class="btn w2" data-act="entrada" data-id="${i.id}">+ Repor</button>${podeFin()?'<div class="m">O valor é opcional e vai para o Financeiro.</div>':''}</div>
 <div class="c"><h2>Dar saída</h2><div class="g">${inp('sq','','type="number" min="0" step="any" placeholder="Quantidade"')}${selH('sd',DEST.map(d=>[d,d]),'Tanque 1')}</div><button class="btn w2" data-act="saida" data-id="${i.id}">− Registrar saída</button></div>
 <div class="c"><h2>Histórico</h2>${hist}</div><button class="btn w2" data-act="paexcluir" data-id="${i.id}">Excluir item</button>`}
 
@@ -521,7 +530,7 @@ function vTqNovo(){return `${back('peixes')}<h1>Novo tanque ou lote</h1>${field(
 <div class="g">${field('tq','Peixes povoados',inp('tq','','type="number" min="1" inputmode="numeric"'))}${field('tp','Peso médio inicial (g)',inp('tp','','type="number" min="0" step="any" inputmode="decimal"'))}</div>
 <div class="g">${field('td','Data do povoamento',inp('td',hojeISO(),'type="date"'))}${field('tdp','Despesca prevista',inp('tdp','','type="date"'))}</div>
 <div class="g">${field('tm','Meta de peso (g)',inp('tm','','type="number" min="0" step="any" inputmode="decimal"'))}${field('tf','Refeições por dia',inp('tf',2,'type="number" min="1"'))}</div>
-<div class="g">${field('tv','Volume (m³, opcional)',inp('tv','','type="number" min="0" step="any" inputmode="decimal"'))}${field('tc','Custo dos alevinos (R$)',inp('tc','','type="number" min="0" step="any" inputmode="decimal"'))}</div><button class="btn" data-act="tqsalvar">Salvar tanque</button>`}
+<div class="g">${field('tv','Volume (m³, opcional)',inp('tv','','type="number" min="0" step="any" inputmode="decimal"'))}${podeFin()?field('tc','Custo dos alevinos (R$)',inp('tc','','type="number" min="0" step="any" inputmode="decimal"')):''}</div><button class="btn" data-act="tqsalvar">Salvar tanque</button>`}
 function vTqDet(){
   const t=tanques.find(x=>x.id===tqSel);if(!t)return vPeixes();
   const A=alertasPx().filter(a=>a.t.id===t.id),m=ultMed(t.id),hoje=d0(Date.now());
@@ -534,7 +543,7 @@ ${A.filter(a=>a.n>=2).map(a=>`<div class="c" style="background:#FBE9E5;border-co
 <div class="c"><h2>Crescimento</h2>${t.metaPeso?`<div class="bar"><i style="width:${prog}%"></i></div><div class="m">${Math.round(prog)}% da meta de ${t.metaPeso} g</div>`:'<div class="m">Defina uma meta de peso ao cadastrar.</div>'}<div class="m">Dia ${dias} de cultivo${t.despescaPrev?' · despesca prevista '+fmt(t.despescaPrev):''}</div></div>
 <div class="c"><h2>Água</h2>${m?`<div class="m" style="color:#1F3B2B">${fmtDT(m.em)} · ${[m.temp!=null?m.temp+' °C':'',m.ph!=null?'pH '+m.ph:'',m.o2!=null?'O₂ '+m.o2+' mg/L':''].filter(Boolean).join(' · ')}</div>`:'<div class="m">Sem medições ainda.</div>'}</div>
 <div class="c"><h2>Alimentação de hoje</h2><div class="m">${rh.length} de ${t.refeicoes||2} refeições · ${kg.toFixed(1)} kg</div></div><div class="c"><h2>Equipamentos</h2>${eq}</div>
-<div class="g"><button class="btn" data-go="agua">Água</button><button class="btn" data-go="manejo">Manejo</button><button class="btn w2" data-go="graficos">Gráficos</button><button class="btn w2" data-go="lote">Lote e custos</button></div>`}
+<div class="g"><button class="btn" data-go="agua">Água</button><button class="btn" data-go="manejo">Manejo</button><button class="btn w2" data-go="graficos">Gráficos</button>${podeFin()?'<button class="btn w2" data-go="lote">Lote e custos</button>':''}</div>`}
 function vAgua(){
   const t=tanques.find(x=>x.id===tqSel);if(!t)return vPeixes();
   const L=lim(),m=ultMed(t.id),hist=meds.filter(x=>x.tanqueId===t.id).slice(0,8);
@@ -554,7 +563,7 @@ function vManejo(){
 <div class="c"><h2>Alimentação</h2>${field('rk','Ração oferecida (kg)',inp('rk','','type="number" min="0" step="any" inputmode="decimal"'))}${field('ri','Descontar do paiol',selH('ri',[['','Não descontar'],...rac.map(i=>[i.id,i.nome+' ('+i.qtd+' kg)'])],''))}<button class="btn" data-act="racao">Registrar arraçoamento</button></div>
 <div class="c"><h2>Biometria</h2>${field('bp','Peso médio da amostra (g)',inp('bp','','type="number" min="0" step="any" inputmode="decimal"'))}<button class="btn w2" data-act="biometria">Registrar biometria</button></div>
 <div class="c"><h2>Mortalidade</h2>${field('mn','Peixes mortos',inp('mn','','type="number" min="1" inputmode="numeric"'))}<button class="btn w2" data-act="mortes">Registrar perda</button></div>
-<div class="c"><h2>Despesca</h2><div class="g">${field('dn','Peixes retirados',inp('dn','','type="number" min="1" inputmode="numeric"'))}${field('dk','Peso total (kg)',inp('dk','','type="number" min="0" step="any" inputmode="decimal"'))}</div>${field('dv','Valor recebido (R$, opcional)',inp('dv','','type="number" min="0" step="any" inputmode="decimal"'))}<button class="btn w2" data-act="despesca">Registrar despesca</button></div>
+<div class="c"><h2>Despesca</h2><div class="g">${field('dn','Peixes retirados',inp('dn','','type="number" min="1" inputmode="numeric"'))}${field('dk','Peso total (kg)',inp('dk','','type="number" min="0" step="any" inputmode="decimal"'))}</div>${podeFin()?field('dv','Valor recebido (R$, opcional)',inp('dv','','type="number" min="0" step="any" inputmode="decimal"')):''}<button class="btn w2" data-act="despesca">Registrar despesca</button></div>
 <div class="c"><h2>Histórico</h2>${hist}</div>`}
 function pontos(arr,campo){return arr.filter(x=>x[campo]!=null).map(x=>({x:x.em,y:x[campo]})).sort((a,b)=>a.x-b.x)}
 function chart(pts,lines){
@@ -600,23 +609,24 @@ function vPerfil(){
   const dono=sitio?.donoUid===user.uid;
   return `${back('home')}<h1>Meu perfil</h1>
 <div class="c" style="align-items:center;text-align:center">${avatar(84)}<h2>${esc(user.displayName||'Sem nome')}</h2><div class="m">${esc(user.email||'')}</div></div>
-<div class="c"><h2>Propriedade ativa</h2><div class="m">${esc(sitio?.nome||'—')} · você é ${dono?'dono':'membro'}</div><button class="btn w2" data-go="props">Minhas propriedades (${props.length})</button></div>
+<div class="c"><h2>Propriedade ativa</h2><div class="m">${esc(sitio?.nome||'—')} · você é ${PAPEL[meuPapel()]}</div><button class="btn w2" data-go="props">Minhas propriedades (${props.length})</button></div>
 <div class="c"><h2>Dados</h2><div class="m">Baixe uma cópia de tudo da propriedade ativa.</div><button class="btn w2" data-act="exportar">Exportar dados (backup)</button></div>
-<div class="c"><h2>Conta</h2><div class="m">Login feito com a sua conta Google. Sair desconecta só este aparelho.</div><button class="btn w2" data-act="logout">Sair da conta</button></div>
-<div class="m" style="text-align:center">${esc(APP_NOME)} · versão 5</div>`}
-const cardConv=()=>convRec.map(c=>`<div class="c"><h2>Convite para ${esc(c.sitioNome||'uma propriedade')}</h2><div class="m">${esc(c.deNome||c.deEmail||'Alguém')} quer te adicionar como gestor. Você pode aceitar ou recusar.</div><div class="g"><button class="btn" data-act="convaceitar" data-id="${c.id}">Aceitar</button><button class="btn w2" data-act="convrecusar" data-id="${c.id}">Recusar</button></div></div>`).join('');
+<div class="c"><h2>Conta</h2><div class="m">Login feito com a sua conta Google. Sair desconecta só este aparelho.</div><button class="btn w2" data-act="logout">Sair da conta</button><button class="btn w2" data-act="limparlocal">Sair e apagar dados deste aparelho</button></div>
+<div class="c"><h2>Privacidade e seus dados</h2><div class="m">Seus direitos pela LGPD: ver, baixar e apagar seus dados.</div><div class="g"><a class="btn w2" href="privacidade.html" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">Privacidade</a><a class="btn w2" href="termos.html" target="_blank" rel="noopener" style="text-decoration:none;text-align:center">Termos</a></div><button class="btn w2" data-act="apagarconta" style="color:#9B3B2E">Apagar minha conta e meus dados</button></div>
+<div class="m" style="text-align:center">${esc(APP_NOME)} · versão 6</div>`}
+const cardConv=()=>convRec.map(c=>`<div class="c"><h2>Convite para ${esc(c.sitioNome||'uma propriedade')}</h2><div class="m">${esc(c.deNome||c.deEmail||'Alguém')} quer te adicionar como ${c.papel==='funcionario'?'funcionário':'gestor'}. Você pode aceitar ou recusar.</div><div class="g"><button class="btn" data-act="convaceitar" data-id="${c.id}">Aceitar</button><button class="btn w2" data-act="convrecusar" data-id="${c.id}">Recusar</button></div></div>`).join('');
 const ST={pendente:'Aguardando resposta',aceito:'Aceito',recusado:'Recusado'};
 function vMembros(){
   if(!sitio)return vProps();
   const dono=sitio.donoUid===user.uid,info=sitio.membrosInfo||{},M=sitio.memberUids||[];
   const rows=M.map(u=>{const i=info[u]||{},eu=u===user.uid,isD=u===sitio.donoUid;
-    return `<div class="c"><div class="r"><div class="f1"><h2>${esc(i.nome||(eu?(user.displayName||'Você'):isD?'Dono':'Gestor'))}${eu?' (você)':''}</h2><div class="m">${esc(i.email||'')}${i.email?' · ':''}${isD?'dono':'gestor'}</div></div>${dono&&!isD?`<button class="btn w2 sm" data-act="membroremover" data-id="${u}">Remover</button>`:''}</div></div>`}).join('');
+    return `<div class="c"><div class="r"><div class="f1"><h2>${esc(i.nome||(eu?(user.displayName||'Você'):isD?'Dono':'Gestor'))}${eu?' (você)':''}</h2><div class="m">${esc(i.email||'')}${i.email?' · ':''}${isD?'dono':PAPEL[i.papel]||'gestor'}</div></div>${dono&&!isD?`<div class="g"><button class="btn w2 sm" data-act="membropapel" data-id="${u}">${i.papel==='funcionario'?'Tornar gestor':'Tornar funcionário'}</button><button class="btn w2 sm" data-act="membroremover" data-id="${u}">Remover</button></div>`:''}</div></div>`}).join('');
   const env=[...convEnv].sort((a,b)=>b.criadoEm-a.criadoEm).map(c=>`<div class="c"><div class="r"><div class="f1"><h2>${esc(c.paraEmail)}</h2><div class="m">${ST[c.status]||c.status}</div></div><button class="btn w2 sm" data-act="convcancelar" data-id="${c.id}">${c.status==='pendente'?'Cancelar':'Apagar'}</button></div></div>`).join('');
   return `${back('props')}<h1>Membros</h1><div class="m">${esc(sitio.nome)}</div>${rows}`+
-  (dono?`<div class="c"><h2>Convidar um gestor</h2><div class="m">Digite o e-mail Google que a pessoa usa no app. Ela vê o convite ao entrar e escolhe aceitar ou recusar.</div>${inp('ce','','type="email" inputmode="email" autocapitalize="none" placeholder="email@gmail.com"')}<button class="btn" data-act="convidar">Enviar convite</button></div>${env?'<div><h2>Convites enviados</h2></div>'+env:''}`:`<button class="btn w2" data-act="sair">Sair desta propriedade</button>`)}
+  (dono?`<div class="c"><h2>Convidar uma pessoa</h2><div class="m">Digite o e-mail Google que a pessoa usa no app. Ela vê o convite ao entrar e escolhe aceitar ou recusar.</div>${inp('ce','','type="email" inputmode="email" autocapitalize="none" placeholder="email@gmail.com"')}${field('cp','Papel',selH('cp',[['gestor','Gestor: vê tudo, inclusive o Financeiro'],['funcionario','Funcionário: opera o dia a dia, sem Financeiro']],'gestor'))}<button class="btn" data-act="convidar">Enviar convite</button></div>${env?'<div><h2>Convites enviados</h2></div>'+env:''}`:`<button class="btn w2" data-act="sair">Sair desta propriedade</button>`)}
 function vProps(){
   return `${back('home')}<h1>Minhas propriedades</h1><div class="m">Cada propriedade tem seus próprios canteiros, ferramentas, paiol e tanques.</div>${cardConv()}`+
-  props.map(p=>`<div class="c"><div class="r"><div class="f1"><h2>${esc(p.nome)}</h2><div class="m">${esc(p.tipo||'Sítio')}${p.cidade?' · '+esc(p.cidade):''} · ${p.donoUid===user.uid?'dono':'membro'}</div></div>${p.id===sid?'<span class="t">Ativa</span>':''}</div>${p.id===sid?`<div class="g"><button class="btn w2 sm" data-act="renomear">Renomear</button><button class="btn w2 sm" data-go="membros">Membros</button></div>`:`<button class="btn sm" data-act="trocar" data-id="${p.id}">Abrir esta propriedade</button>`}</div>`).join('')+
+  props.map(p=>`<div class="c"><div class="r"><div class="f1"><h2>${esc(p.nome)}</h2><div class="m">${esc(p.tipo||'Sítio')}${p.cidade?' · '+esc(p.cidade):''} · ${p.donoUid===user.uid?'dono':'membro'}</div></div>${p.id===sid?'<span class="t">Ativa</span>':''}</div>${p.id===sid?`<div class="g"><button class="btn w2 sm" data-act="renomear">Renomear</button><button class="btn w2 sm" data-go="membros">Membros</button></div>${p.donoUid===user.uid?`<button class="btn w2 sm" data-act="propexcluir" style="color:#9B3B2E">Excluir propriedade</button>`:''}`:`<button class="btn sm" data-act="trocar" data-id="${p.id}">Abrir esta propriedade</button>`}</div>`).join('')+
   `<button class="btn" data-act="propnovo">+ Nova propriedade</button><div class="m">Em Membros, o dono convida outros gestores pelo e-mail Google. Cada convite pode ser aceito ou recusado.</div>`}
 function vPropNovo(){return `${back('props')}<h1>Nova propriedade</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Fazenda Santa Luzia"'))}${field('tipo','Tipo',selH('tipo',['Sítio','Fazenda','Chácara','Outro'].map(x=>[x,x]),'Sítio'))}${field('cidade','Cidade (opcional)',inp('cidade','','placeholder="Ex.: Marechal Floriano"'))}<button class="btn" data-act="propsalvar">Criar propriedade</button>`}
 
@@ -702,14 +712,20 @@ function vFinResDet(){
 <div class="g"><button class="btn" data-act="rescompart">Compartilhar</button><button class="btn w2" data-act="resbaixar">Baixar</button></div>`}
 const tentouRes=new Set();
 async function ensureResumo(){
-  if(!sid||!finOk||!resOk)return;
+  if(!sid||!finOk||!resOk||!podeFin())return;
   const a=addD(wStart(Date.now()),-7),id='w'+iso(a);
   if(tentouRes.has(sid+id)||resumos.some(r=>r.id===id))return;
   const r=resumoDe(a,addD(a,7));if(!r.n)return;
   tentouRes.add(sid+id);
   try{await setDoc(dref('resumos',id),{...r,criadoEm:Date.now()})}catch(e){console.error(e)}
 }
+function cardBackup(){
+  if(meuPapel()!=='dono'||!(cants.length+fers.length+itens.length+tanques.length))return '';
+  let t=0;try{t=+localStorage.getItem('bk_'+sid)||0}catch(e){}
+  if(Date.now()-t<7*DAY)return '';
+  return `<div class="c"><div class="r">${mini('saco',44)}<div class="f1"><h2>Hora do backup</h2><div class="m">${t?'Último backup há '+Math.floor((Date.now()-t)/DAY)+' dias.':'Você ainda não baixou nenhum backup.'} Guarde o arquivo no Google Drive.</div></div><button class="btn sm" data-act="exportar">Baixar</button></div></div>`}
 function cardResumo(){
+  if(!podeFin())return '';
   const r=[...resumos].sort((x,y)=>y.ini-x.ini)[0];if(!r||r.ini<Date.now()-21*DAY)return '';
   let visto='';try{visto=localStorage.getItem('rv_'+sid)||''}catch(e){}if(visto===r.id)return '';
   return `<div class="c"><div class="r">${mini('moeda',44)}<div class="f1"><h2>Resumo da semana</h2><div class="m">${dd(r.ini)} a ${dd(addD(r.fim,-1))} · gastos ${fmtR(r.gastos)} · saldo ${fmtR(r.saldo)}</div></div><button class="btn sm" data-act="resabrir" data-id="${r.id}">Ver</button></div></div>`}
@@ -722,6 +738,7 @@ function render(){
   if(erroDb&&(!sid||!user)){nav.hidden=true;app.innerHTML=splash(erroDb);return}
   if(!authReady||!splashOk||(user&&!sid)){nav.hidden=true;app.innerHTML=splash(authReady&&user?'Carregando seu sítio…':'Abrindo…');return}
   if(!user){nav.hidden=true;app.innerHTML=vLogin();return}
+  if(FINV.includes(view)&&!podeFin())view='home';
   app.innerHTML=VIEWS[view]();lastView=view;scrollTo(0,y);
   nav.hidden=false;const on=AREA[view];
   nav.innerHTML=[['home','Início'],['hortas','Hortas'],['oficina','Oficina'],['paiol','Paiol'],['peixes','Peixes']].map(([k,l])=>`<button class="${on===k?'on':''}" data-go="${k}">${l}</button>`).join('');
@@ -739,6 +756,15 @@ document.addEventListener('click',async e=>{
   try{
     if(a==='login')await signInWithPopup(auth,new GoogleAuthProvider());
     else if(a==='logout')await signOut(auth);
+    else if(a==='limparlocal'){if(confirm('Sair e apagar tudo o que ficou guardado neste aparelho? Seus dados na nuvem continuam salvos.'))await limparLocal()}
+    else if(a==='apagarconta')await apagarConta();
+    else if(a==='propexcluir'){
+      const t=prompt('Isso apaga a propriedade "'+(sitio?.nome||'')+'" e todos os dados dela para TODOS os membros. Não dá para desfazer.\nBaixe um backup antes. Para confirmar, digite EXCLUIR:');
+      if((t||'').trim().toUpperCase()!=='EXCLUIR'){toast('Cancelado');return}
+      toast('Excluindo…');const id0=sid,outra=props.find(x=>x.id!==id0);
+      dataUnsubs.forEach(f=>f());dataUnsubs=[];
+      await apagarSitio(id0);
+      await setDoc(doc(db,'users',user.uid),{sitioId:outra?outra.id:null},{merge:true});location.reload()}
     else if(a==='soon')toast('Essa área chega nas próximas etapas');
     else if(a==='exportar')exportar();
     else if(a==='cat'){cat=id;render()}
@@ -761,7 +787,7 @@ document.addEventListener('click',async e=>{
       const r=await addDoc(collection(db,'sitios'),{nome,tipo:val('tipo'),cidade:val('cidade').trim(),donoUid:user.uid,memberUids:[user.uid],membrosInfo:{[user.uid]:{nome:user.displayName||'',email:(user.email||'').toLowerCase()}},xp:0,criadoEm:Date.now()});
       await setDoc(doc(db,'users',user.uid),{sitioId:r.id},{merge:true});abrirSitio(r.id);view='home';render();toast('Propriedade criada')}
     else if(a==='trocar'){await setDoc(doc(db,'users',user.uid),{sitioId:id},{merge:true});abrirSitio(id);view='home';render();scrollTo(0,0)}
-    else if(a==='renomear'){const n=(prompt('Novo nome da propriedade:',sitio?.nome||'')||'').trim();if(n)await updateDoc(doc(db,'sitios',sid),{nome:n})}
+    else if(a==='renomear'){if(meuPapel()==='funcionario'){toast('Só dono e gestor podem renomear');return}const n=(prompt('Novo nome da propriedade:',sitio?.nome||'')||'').trim();if(n)await updateDoc(doc(db,'sitios',sid),{nome:n})}
     else if(a==='conferir'){loadConf();view='conf';render();scrollTo(0,0)}
     else if(a==='cfmais'||a==='cfmenos'){const f=fers.find(x=>x.id===id),c=conf[id]||{};conf[id]={...c,r:'dif',qtd:Math.max(0,(c.qtd??f.qtd)+(a==='cfmais'?1:-1))};saveConf();render()}
     else if(a==='cfmarcar'){fers.forEach(f=>{const c=conf[f.id]||{};if(!c.r||c.r==='pulo')conf[f.id]={...c,r:'ok'}});saveConf();render()}
@@ -809,6 +835,7 @@ document.addEventListener('click',async e=>{
     else if(a==='eqligar'){await updateDoc(dref('equipamentos',id),{estado:'ligado',desde:Date.now()});toast('Equipamento marcado como ligado')}
     else if(a==='eqexcluir'){if(confirm('Excluir este equipamento?'))await deleteDoc(dref('equipamentos',id))}
     else if(a==='regrassalvar'){
+      if(meuPapel()==='funcionario'){toast('Só dono e gestor podem mudar as regras');return}
       const v=k=>num(k),L={o2Min:v('l1'),o2Emerg:v('l2'),tMin:v('l3'),tMax:v('l4'),phMin:v('l5'),phMax:v('l6')};
       if(Object.values(L).some(x=>isNaN(x))||L.o2Emerg>L.o2Min||L.tMin>=L.tMax||L.phMin>=L.phMax){toast('Confira os valores');return}
       await updateDoc(doc(db,'sitios',sid),{limites:L});toast('Regras salvas')}
@@ -818,18 +845,21 @@ document.addEventListener('click',async e=>{
       const em=val('ce').trim().toLowerCase();
       if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){toast('Digite um e-mail válido');return}
       if(em===(user.email||'').toLowerCase()||Object.values(sitio.membrosInfo||{}).some(i=>i.email===em)){toast('Essa pessoa já participa da propriedade');return}
-      await setDoc(doc(db,'convites',sid+'_'+em),{sitioId:sid,sitioNome:sitio.nome||'',deUid:user.uid,deNome:user.displayName||'',deEmail:(user.email||'').toLowerCase(),paraEmail:em,status:'pendente',criadoEm:Date.now()});
+      await setDoc(doc(db,'convites',sid+'_'+em),{sitioId:sid,sitioNome:sitio.nome||'',deUid:user.uid,deNome:user.displayName||'',deEmail:(user.email||'').toLowerCase(),paraEmail:em,papel:val('cp')==='funcionario'?'funcionario':'gestor',status:'pendente',criadoEm:Date.now()});
       render();toast('Convite enviado. A pessoa precisa entrar no app com esse e-mail')}
     else if(a==='convcancelar'){await deleteDoc(doc(db,'convites',id));toast('Convite removido')}
     else if(a==='convrecusar'){await updateDoc(doc(db,'convites',id),{status:'recusado'});toast('Convite recusado')}
     else if(a==='convaceitar'){
       const c=convRec.find(x=>x.id===id);if(!c)return;el.disabled=true;
       const b=writeBatch(db);
-      b.update(doc(db,'sitios',c.sitioId),{memberUids:arrayUnion(user.uid),['membrosInfo.'+user.uid]:{nome:user.displayName||'',email:(user.email||'').toLowerCase()}});
+      b.update(doc(db,'sitios',c.sitioId),{memberUids:arrayUnion(user.uid),['membrosInfo.'+user.uid]:{nome:user.displayName||'',email:(user.email||'').toLowerCase(),papel:c.papel==='funcionario'?'funcionario':'gestor'}});
       b.update(doc(db,'convites',c.id),{status:'aceito'});
       await b.commit();
       await setDoc(doc(db,'users',user.uid),{sitioId:c.sitioId},{merge:true});
       abrirSitio(c.sitioId);view='home';render();scrollTo(0,0);toast('Você entrou em '+(c.sitioNome||'a propriedade'))}
+    else if(a==='membropapel'){
+      const i0=(sitio.membrosInfo||{})[id]||{},novo=i0.papel==='funcionario'?'gestor':'funcionario';
+      await updateDoc(doc(db,'sitios',sid),{['membrosInfo.'+id+'.papel']:novo});toast('Papel atualizado: '+PAPEL[novo])}
     else if(a==='membroremover'){
       if(!confirm('Remover esta pessoa da propriedade? Ela perde o acesso na hora.'))return;
       const info={...(sitio.membrosInfo||{})};delete info[id];
@@ -936,16 +966,48 @@ document.addEventListener('input',e=>{
 });
 
 /* ---------- backup ---------- */
+async function apagarSitio(id){
+  for(const n of SUBS){for(let i=0;i<500;i++){
+    const s=await getDocs(query(collection(db,'sitios',id,n),limit(400)));if(s.empty)break;
+    const b=writeBatch(db);s.docs.forEach(d=>b.delete(d.ref));await b.commit()}}
+  const cv=await getDocs(query(collection(db,'convites'),where('deUid','==',user.uid)));
+  const b=writeBatch(db);cv.docs.filter(d=>d.data().sitioId===id).forEach(d=>b.delete(d.ref));b.delete(doc(db,'sitios',id));await b.commit();
+}
+async function limparLocal(){
+  try{dataUnsubs.forEach(f=>f());unsubs.forEach(f=>f())}catch(e){}
+  try{await signOut(auth)}catch(e){}
+  try{await terminate(db);await clearIndexedDbPersistence(db)}catch(e){console.error(e)}
+  try{localStorage.clear();sessionStorage.clear()}catch(e){}
+  location.reload();
+}
+async function apagarConta(){
+  const t=prompt('Isso apaga a sua conta e TODOS os dados das propriedades das quais você é dono. Não dá para desfazer.\nBaixe um backup antes. Para confirmar, digite APAGAR:');
+  if((t||'').trim().toUpperCase()!=='APAGAR'){toast('Cancelado');return}
+  try{await reauthenticateWithPopup(auth.currentUser,new GoogleAuthProvider())}catch(e){toast('Não consegui confirmar o seu login');return}
+  toast('Apagando…');
+  try{
+    const uid=user.uid,meus=[...props],rec=[...convRec];
+    dataUnsubs.forEach(f=>f());dataUnsubs=[];unsubs.forEach(f=>f());unsubs=[];
+    for(const q0 of meus){
+      if(q0.donoUid===uid)await apagarSitio(q0.id);
+      else{const info={...(q0.membrosInfo||{})};delete info[uid];
+        await updateDoc(doc(db,'sitios',q0.id),{memberUids:(q0.memberUids||[]).filter(x=>x!==uid),membrosInfo:info})}}
+    for(const c of rec){try{await deleteDoc(doc(db,'convites',c.id))}catch(e){}}
+    await deleteDoc(doc(db,'users',uid));
+    await deleteUser(auth.currentUser);
+  }catch(e){console.error(e);toast('Não consegui apagar tudo. Tente de novo.');return}
+  await limparLocal();
+}
 function exportar(){
   const dados={exportadoEm:new Date().toISOString(),sitio,canteiros:cants,ferramentas:fers,itens,movimentos:movs,conferencias:rels,tanques,equipamentos:equips,medicoes:meds,manejos,lancamentos:lancs,funcionarios:funcs,presencas:pres,resumos,convites:convEnv};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(dados,null,1)],{type:'application/json'}));
-  a.download='sitio-backup-'+hojeISO()+'.json';document.body.appendChild(a);a.click();a.remove();toast('Backup baixado');
+  a.download='sitio-backup-'+hojeISO()+'.json';document.body.appendChild(a);a.click();a.remove();try{localStorage.setItem('bk_'+sid,String(Date.now()))}catch(e){}render();toast('Backup baixado');
 }
 
 /* ---------- login e dados ---------- */
 function falha(err){erroDb='Não consegui acessar o banco. Verifique se o Firestore foi criado e as regras publicadas.';console.error(err);toast('Erro no banco de dados');render()}
 let dataUnsubs=[];
-const sub=(n,set,ref)=>onSnapshot(ref||col(n),s=>{set(s.docs.map(d=>({id:d.id,...d.data()})));ensureResumo();refresh()},falha);
+const sub=(n,set,ref,quiet)=>onSnapshot(ref||col(n),s=>{set(s.docs.map(d=>({id:d.id,...d.data()})));ensureResumo();refresh()},quiet?e=>{if(!(e&&e.code==='permission-denied'))falha(e)}:falha);
 function abrirSitio(id){
   dataUnsubs.forEach(f=>f());dataUnsubs=[];sid=id;sitio=null;cants=[];fers=[];itens=[];movs=[];rels=[];tanques=[];equips=[];meds=[];manejos=[];lancs=[];funcs=[];pres=[];resumos=[];finOk=false;resOk=false;holos={};convEnv=[];
   dataUnsubs.push(onSnapshot(doc(db,'sitios',sid),s=>{sitio=s.data();refresh()},falha),
@@ -958,8 +1020,8 @@ function abrirSitio(id){
     sub('medicoes',a=>meds=a,query(col('medicoes'),orderBy('em','desc'),limit(400))),
     sub('manejos',a=>manejos=a,query(col('manejos'),orderBy('em','desc'),limit(400))),
     sub('movimentos',a=>movs=a,query(col('movimentos'),orderBy('em','desc'),limit(200))),
-    sub('lancamentos',a=>{lancs=a;finOk=true},query(col('lancamentos'),orderBy('em','desc'),limit(1500))),sub('funcionarios',a=>funcs=a.sort((x,y)=>x.criadoEm-y.criadoEm)),sub('presencas',a=>pres=a,query(col('presencas'),orderBy('em','desc'),limit(600))),
-    sub('resumos',a=>{resumos=a;resOk=true}),
+    sub('lancamentos',a=>{lancs=a;finOk=true},query(col('lancamentos'),orderBy('em','desc'),limit(1500)),true),sub('funcionarios',a=>funcs=a.sort((x,y)=>x.criadoEm-y.criadoEm),null,true),sub('presencas',a=>pres=a,query(col('presencas'),orderBy('em','desc'),limit(600)),true),
+    sub('resumos',a=>{resumos=a;resOk=true},null,true),
     onSnapshot(query(collection(db,'convites'),where('deUid','==',user.uid)),s=>{convEnv=s.docs.map(d=>({id:d.id,...d.data()})).filter(c=>c.sitioId===sid);refresh()},()=>{}));
   render();
 }
