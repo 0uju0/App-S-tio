@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Meu Sítio</title>
-<meta name="theme-color" content="#2B1810">
+<meta name="theme-color" content="#1F3B2B">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,37 +13,37 @@
 <style>
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;font-family:Inter,sans-serif;font-size:15px;color:#2B1810;background:linear-gradient(118deg,transparent 40%,rgba(184,137,59,.07) 40.3%,transparent 41%),linear-gradient(160deg,transparent 70%,rgba(43,24,16,.035) 70.3%,transparent 71.2%),linear-gradient(180deg,#FAF8F3,#F4F0E8) fixed}
+body{margin:0;font-family:Inter,sans-serif;font-size:15px;color:#1F3B2B;background:linear-gradient(118deg,transparent 40%,rgba(79,138,75,.07) 40.3%,transparent 41%),linear-gradient(160deg,transparent 70%,rgba(31,59,43,.035) 70.3%,transparent 71.2%),linear-gradient(180deg,#F7FAF4,#EDF3E7) fixed}
 #app{max-width:430px;margin:0 auto;min-height:100dvh;padding:calc(env(safe-area-inset-top) + 22px) 20px 104px;display:flex;flex-direction:column;gap:14px}
 h1{margin:0;font-family:'Playfair Display',serif;font-size:26px;font-weight:600}h2{margin:0;font-size:15px;font-weight:600}
-.m{font-size:13.5px;line-height:1.4;color:#6F6155}
-.c{background:#FFFEFB;border:1px solid #ECE3D0;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 2px rgba(43,24,16,.04),0 8px 24px rgba(43,24,16,.04)}
+.m{font-size:13.5px;line-height:1.4;color:#5E6F60}
+.c{background:#FDFEFB;border:1px solid #DDE6D2;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 1px 2px rgba(31,59,43,.04),0 8px 24px rgba(31,59,43,.04)}
 .r{display:flex;align-items:center;gap:12px}.f1{flex:1;min-width:0}
 .b{border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none}
-.t{font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:#F1E7D3;color:#4A2E20;border:1px solid #E3D2AE;white-space:nowrap}
+.t{font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:#E4EEDA;color:#2F5A41;border:1px solid #C6D6B4;white-space:nowrap}
 .w{background:#FBEFD2;border-color:#EBD59A;color:#6B4A12}.p{background:#F9E1DC;border-color:#E3B0A8;color:#6B1F16}
-.bar{height:8px;border-radius:99px;background:#EFE6D3;overflow:hidden}.bar i{display:block;height:100%;background:#C9A25B;border-radius:99px}
+.bar{height:8px;border-radius:99px;background:#E3ECD8;overflow:hidden}.bar i{display:block;height:100%;background:#6E9A5A;border-radius:99px}
 .g{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.big{border:1px solid #ECE3D0;box-shadow:0 1px 2px rgba(43,24,16,.04),0 8px 24px rgba(43,24,16,.04);border-radius:16px;padding:14px;min-height:112px;text-align:left;font:600 15px Inter,sans-serif;background:#FFFEFB;color:#2B1810;display:flex;flex-direction:column;justify-content:space-between;gap:10px;cursor:pointer}
-.big span{display:block;font-size:12.5px;font-weight:400;color:#6F6155}.big.off{opacity:.5}
-.btn{border:0;border-radius:12px;min-height:48px;padding:0 18px;font:600 15px Inter,sans-serif;color:#2B1810;background:#DCC38C;cursor:pointer}
-.btn.w2{background:#FFFEFB;border:1px solid #E3D2AE}.btn.sm{min-height:44px;padding:0 14px}.btn:disabled{opacity:.5}
-.in{width:100%;border:1px solid #E3D2AE;background:#fff;border-radius:12px;padding:12px 14px;font:400 15px Inter,sans-serif;color:#2B1810;min-height:48px}
-:is(.btn,.in,.chip,.link,nav button,input):focus-visible{outline:2px solid #B8893B;outline-offset:2px}
-label{font-size:13.5px;color:#6F6155;display:block;margin-bottom:4px}
-.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid #E3D2AE;background:#FFFEFB;color:#2B1810;border-radius:99px;padding:8px 14px;font:500 13px Inter,sans-serif;cursor:pointer;min-height:40px}.chip.on{background:#F1E7D3;border-color:#C9A25B;font-weight:600}
+.big{border:1px solid #DDE6D2;box-shadow:0 1px 2px rgba(31,59,43,.04),0 8px 24px rgba(31,59,43,.04);border-radius:16px;padding:14px;min-height:112px;text-align:left;font:600 15px Inter,sans-serif;background:#FDFEFB;color:#1F3B2B;display:flex;flex-direction:column;justify-content:space-between;gap:10px;cursor:pointer}
+.big span{display:block;font-size:12.5px;font-weight:400;color:#5E6F60}.big.off{opacity:.5}
+.btn{border:0;border-radius:12px;min-height:48px;padding:0 18px;font:600 15px Inter,sans-serif;color:#1F3B2B;background:#B9D19A;cursor:pointer}
+.btn.w2{background:#FDFEFB;border:1px solid #C6D6B4}.btn.sm{min-height:44px;padding:0 14px}.btn:disabled{opacity:.5}
+.in{width:100%;border:1px solid #C6D6B4;background:#fff;border-radius:12px;padding:12px 14px;font:400 15px Inter,sans-serif;color:#1F3B2B;min-height:48px}
+:is(.btn,.in,.chip,.link,nav button,input):focus-visible{outline:2px solid #4F8A4B;outline-offset:2px}
+label{font-size:13.5px;color:#5E6F60;display:block;margin-bottom:4px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid #C6D6B4;background:#FDFEFB;color:#1F3B2B;border-radius:99px;padding:8px 14px;font:500 13px Inter,sans-serif;cursor:pointer;min-height:40px}.chip.on{background:#E4EEDA;border-color:#6E9A5A;font-weight:600}
 .box{flex:1;align-items:center;padding:10px;text-align:center}.box b{font-size:19px;font-weight:600}
-.tabs{display:flex;border-bottom:1px solid #ECE3D0}.tab{flex:1;background:none;border:0;padding:12px 4px;font:500 14px Inter,sans-serif;color:#7A6B5C;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}.tab.on{color:#2B1810;font-weight:700;border-bottom-color:#B8893B}
-.form{border-top:5px solid #C9A25B}.opts{display:flex;flex-direction:column}.opt{display:flex;gap:12px;align-items:center;min-height:44px;padding:4px;cursor:pointer;font-size:15px}.opt input{width:22px;height:22px;accent-color:#9C7430;flex:none}
-.chk{cursor:pointer}.chk input{width:26px;height:26px;accent-color:#9C7430;flex:none}
-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100%);height:calc(62px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(255,254,251,.97);border-top:1px solid #ECE3D0;display:flex;justify-content:space-around;align-items:center}
-nav button{background:none;border:0;color:#7A6B5C;font:500 12.5px Inter,sans-serif;padding:14px 8px;cursor:pointer;border-bottom:2px solid transparent}
-nav button.on{color:#2B1810;font-weight:700;border-bottom-color:#B8893B}nav button.off{opacity:.45}
+.tabs{display:flex;border-bottom:1px solid #DDE6D2}.tab{flex:1;background:none;border:0;padding:12px 4px;font:500 14px Inter,sans-serif;color:#667A68;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}.tab.on{color:#1F3B2B;font-weight:700;border-bottom-color:#4F8A4B}
+.form{border-top:5px solid #6E9A5A}.opts{display:flex;flex-direction:column}.opt{display:flex;gap:12px;align-items:center;min-height:44px;padding:4px;cursor:pointer;font-size:15px}.opt input{width:22px;height:22px;accent-color:#3F7A47;flex:none}
+.chk{cursor:pointer}.chk input{width:26px;height:26px;accent-color:#3F7A47;flex:none}
+nav{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:min(430px,100%);height:calc(62px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:rgba(255,254,251,.97);border-top:1px solid #DDE6D2;display:flex;justify-content:space-around;align-items:center}
+nav button{background:none;border:0;color:#667A68;font:500 12.5px Inter,sans-serif;padding:14px 8px;cursor:pointer;border-bottom:2px solid transparent}
+nav button.on{color:#1F3B2B;font-weight:700;border-bottom-color:#4F8A4B}nav button.off{opacity:.45}
 .h{display:flex;justify-content:center}.fl{animation:f 5s ease-in-out infinite}
 @keyframes f{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
 @media (prefers-reduced-motion:reduce){.fl{animation:none}}
-#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#2B1810;color:#F3E7CF;padding:10px 16px;border-radius:99px;font-size:13.5px;display:none;max-width:90%;text-align:center;z-index:9}
-.link{background:none;border:0;color:#6F6155;font:500 13.5px Inter,sans-serif;text-decoration:underline;cursor:pointer;padding:8px 0}
+#toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#1F3B2B;color:#E4F0D8;padding:10px 16px;border-radius:99px;font-size:13.5px;display:none;max-width:90%;text-align:center;z-index:9}
+.link{background:none;border:0;color:#5E6F60;font:500 13.5px Inter,sans-serif;text-decoration:underline;cursor:pointer;padding:8px 0}
 </style>
 </head>
 <body>
@@ -89,79 +89,79 @@ const CAT={grao:{n:'Grãos',g:'milho',u:'kg'},racao:{n:'Ração',g:'saco',u:'kg'
 const DEST=['Tanque 1','Tanque 2','Tanque 3','Animais','Horta','Venda','Outro'];
 
 /* ---------- hologramas ---------- */
-const OL='stroke="#2B1810" stroke-width="2.5" stroke-linejoin="round"';
+const OL='stroke="#1F3B2B" stroke-width="2.5" stroke-linejoin="round"';
 const GL={
 tomate:`<path d="M30 14v-6" stroke="#6B7F3F" stroke-width="4"/><circle cx="30" cy="32" r="16" fill="#E0574B" ${OL}/><path d="M22 18l8 5 8-5" fill="none" stroke="#6B7F3F" stroke-width="3"/>`,
-moeda:`<circle cx="30" cy="32" r="18" fill="#E3C98F" ${OL}/><circle cx="30" cy="32" r="11" fill="none" stroke="#9C7430" stroke-width="2.5"/><path d="M30 24v16M25.5 29c0-3.5 9-3.5 9 0s-9 4-9 7.5 9 3.5 9 0" fill="none" stroke="#6B4A12" stroke-width="2.2" stroke-linecap="round"/>`,
+moeda:`<circle cx="30" cy="32" r="18" fill="#E3C98F" ${OL}/><circle cx="30" cy="32" r="11" fill="none" stroke="#3F7A47" stroke-width="2.5"/><path d="M30 24v16M25.5 29c0-3.5 9-3.5 9 0s-9 4-9 7.5 9 3.5 9 0" fill="none" stroke="#6B4A12" stroke-width="2.2" stroke-linecap="round"/>`,
 alface:`<circle cx="30" cy="32" r="17" fill="#A9B58A" ${OL}/><circle cx="30" cy="32" r="9" fill="#C9D4A8" ${OL}/>`,
 cenoura:`<polygon points="20,24 40,24 30,54" fill="#D9773F" ${OL}/><path d="M30 24l-7-12M30 24v-14M30 24l7-12" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/>`,
 broto:`<path d="M30 52V26" stroke="#6B7F3F" stroke-width="4"/><path d="M30 34C18 34 14 24 14 18c10 0 16 5 16 16z" fill="#A9B58A" ${OL}/><path d="M30 28c0-8 6-13 16-13 0 6-4 13-16 13z" fill="#C9D4A8" ${OL}/>`,
 martelo:`<rect x="27" y="18" width="6" height="34" rx="2" fill="#8A5A2B" ${OL}/><rect x="14" y="10" width="32" height="14" rx="3" fill="#BDB4A6" ${OL}/>`,
 furadeira:`<rect x="10" y="16" width="34" height="16" rx="4" fill="#E3C98F" ${OL}/><rect x="18" y="32" width="11" height="20" rx="3" fill="#E8A29A" ${OL}/><path d="M44 24h12" stroke="#BDB4A6" stroke-width="4"/>`,
-serra:`<circle cx="30" cy="32" r="20" fill="none" stroke="#BDB4A6" stroke-width="7" stroke-dasharray="5 4"/><circle cx="30" cy="32" r="14" fill="#E6E0D5" ${OL}/><circle cx="30" cy="32" r="4" fill="#2B1810"/>`,
+serra:`<circle cx="30" cy="32" r="20" fill="none" stroke="#BDB4A6" stroke-width="7" stroke-dasharray="5 4"/><circle cx="30" cy="32" r="14" fill="#E6E0D5" ${OL}/><circle cx="30" cy="32" r="4" fill="#1F3B2B"/>`,
 chave:`<path d="M18 46L42 16" stroke="#BDB4A6" stroke-width="7" stroke-linecap="round"/><circle cx="42" cy="16" r="9" fill="#E6E0D5" ${OL}/>`,
 milho:`<ellipse cx="30" cy="30" rx="10" ry="20" fill="#E3C98F" ${OL}/><path d="M18 52Q30 34 42 52" fill="#A9B58A" ${OL}/>`,
 saco:`<path d="M14 18h32l-2 34H16z" fill="#E9C58A" ${OL}/><rect x="19" y="28" width="22" height="12" fill="#fff" ${OL}/>`,
 adubo:`<path d="M14 18h32l-2 34H16z" fill="#E6E0D5" ${OL}/><rect x="19" y="28" width="22" height="12" fill="#A9B58A" ${OL}/>`,
 semente:`<ellipse cx="22" cy="34" rx="7" ry="11" fill="#8A5A2B" ${OL}/><ellipse cx="38" cy="34" rx="7" ry="11" fill="#E3C98F" ${OL}/><ellipse cx="30" cy="22" rx="6" ry="9" fill="#A9B58A" ${OL}/>`,
-peixe:`<ellipse cx="28" cy="32" rx="20" ry="12" fill="#D9A06A" ${OL}/><polygon points="46,32 58,22 58,42" fill="#D9A06A" ${OL}/><circle cx="19" cy="29" r="3" fill="#2B1810"/>`};
+peixe:`<ellipse cx="28" cy="32" rx="20" ry="12" fill="#D9A06A" ${OL}/><polygon points="46,32 58,22 58,42" fill="#D9A06A" ${OL}/><circle cx="19" cy="29" r="3" fill="#1F3B2B"/>`};
 /* ---------- gerador automático de hologramas ---------- */
 const GEN={
-folha:c=>`<circle cx="30" cy="32" r="17" fill="${c}" ${OL}/><circle cx="30" cy="32" r="9" fill="#fff" opacity=".3"/><path d="M30 15v34M14 32h32" stroke="#2B1810" stroke-width="1.5" opacity=".35"/>`,
+folha:c=>`<circle cx="30" cy="32" r="17" fill="${c}" ${OL}/><circle cx="30" cy="32" r="9" fill="#fff" opacity=".3"/><path d="M30 15v34M14 32h32" stroke="#1F3B2B" stroke-width="1.5" opacity=".35"/>`,
 fruto:c=>`<path d="M30 14v-6" stroke="#6B7F3F" stroke-width="4"/><circle cx="30" cy="32" r="16" fill="${c}" ${OL}/><path d="M22 18l8 5 8-5" fill="none" stroke="#6B7F3F" stroke-width="3"/>`,
 raiz:c=>`<polygon points="18,22 42,22 30,54" fill="${c}" ${OL}/><path d="M30 22l-7-12M30 22v-14M30 22l7-12" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/>`,
 espiga:c=>`<path d="M30 54V16" stroke="#6B7F3F" stroke-width="3"/><ellipse cx="22" cy="22" rx="5" ry="9" transform="rotate(-25 22 22)" fill="${c}" ${OL}/><ellipse cx="38" cy="22" rx="5" ry="9" transform="rotate(25 38 22)" fill="${c}" ${OL}/><ellipse cx="22" cy="38" rx="5" ry="9" transform="rotate(-25 22 38)" fill="${c}" ${OL}/><ellipse cx="38" cy="38" rx="5" ry="9" transform="rotate(25 38 38)" fill="${c}" ${OL}/>`,
-engrenagem:(c,l)=>`<circle cx="30" cy="32" r="20" fill="none" stroke="${c}" stroke-width="7" stroke-dasharray="5 4"/><circle cx="30" cy="32" r="14" fill="${c}" ${OL}/><text x="30" y="38" text-anchor="middle" font-size="16" font-weight="800" fill="#2B1810">${esc(l)}</text>`,
-sacoc:(c,l)=>`<path d="M14 18h32l-2 34H16z" fill="${c}" ${OL}/><rect x="19" y="28" width="22" height="14" fill="#fff" ${OL}/><text x="30" y="39" text-anchor="middle" font-size="12" font-weight="800" fill="#2B1810">${esc(l)}</text>`,
-cristal:(c,l)=>`<polygon points="30,8 50,20 50,42 30,54 10,42 10,20" fill="${c}" ${OL}/><text x="30" y="38" text-anchor="middle" font-size="20" font-weight="800" fill="#2B1810">${esc(l)}</text>`,
+engrenagem:(c,l)=>`<circle cx="30" cy="32" r="20" fill="none" stroke="${c}" stroke-width="7" stroke-dasharray="5 4"/><circle cx="30" cy="32" r="14" fill="${c}" ${OL}/><text x="30" y="38" text-anchor="middle" font-size="16" font-weight="800" fill="#1F3B2B">${esc(l)}</text>`,
+sacoc:(c,l)=>`<path d="M14 18h32l-2 34H16z" fill="${c}" ${OL}/><rect x="19" y="28" width="22" height="14" fill="#fff" ${OL}/><text x="30" y="39" text-anchor="middle" font-size="12" font-weight="800" fill="#1F3B2B">${esc(l)}</text>`,
+cristal:(c,l)=>`<polygon points="30,8 50,20 50,42 30,54 10,42 10,20" fill="${c}" ${OL}/><text x="30" y="38" text-anchor="middle" font-size="20" font-weight="800" fill="#1F3B2B">${esc(l)}</text>`,
 pa:()=>`<path d="M30 8v30" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><path d="M20 36h20l-3 16H23z" fill="#BDB4A6" ${OL}/>`,
 enxada:()=>`<path d="M32 6L20 48" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><path d="M12 44h26l-4 10H12z" fill="#BDB4A6" ${OL}/>`,
 alicate:()=>`<path d="M22 8l8 20-8 24M38 8l-8 20 8 24" fill="none" stroke="#BDB4A6" stroke-width="7" stroke-linecap="round"/><circle cx="30" cy="28" r="4" fill="#E8A29A" ${OL}/>`,
 chavefenda:()=>`<rect x="24" y="26" width="13" height="26" rx="5" fill="#E8A29A" ${OL}/><rect x="29" y="6" width="4" height="22" fill="#BDB4A6" ${OL}/>`,
 trena:()=>`<rect x="12" y="18" width="30" height="26" rx="5" fill="#E3C98F" ${OL}/><rect x="40" y="36" width="14" height="5" fill="#BDB4A6" ${OL}/><circle cx="27" cy="31" r="6" fill="#fff" ${OL}/>`,
-regador:()=>`<path d="M16 24h24l-3 26H19z" fill="#8FB3C7" ${OL}/><path d="M40 30l14-10" stroke="#8FB3C7" stroke-width="5" stroke-linecap="round"/><path d="M18 24c0-10 20-10 20 0" fill="none" stroke="#2B1810" stroke-width="3"/>`,
+regador:()=>`<path d="M16 24h24l-3 26H19z" fill="#8FB3C7" ${OL}/><path d="M40 30l14-10" stroke="#8FB3C7" stroke-width="5" stroke-linecap="round"/><path d="M18 24c0-10 20-10 20 0" fill="none" stroke="#1F3B2B" stroke-width="3"/>`,
 mangueira:()=>`<path d="M12 44c0-20 20-8 20-20s16-4 16 8" fill="none" stroke="#6B7F3F" stroke-width="7" stroke-linecap="round"/>`,
-carrinho:()=>`<path d="M10 22h34l-6 18H16z" fill="#E3C98F" ${OL}/><circle cx="46" cy="44" r="7" fill="#BDB4A6" ${OL}/><circle cx="46" cy="44" r="2.5" fill="#2B1810"/><path d="M6 16l6 6M44 22l10-8" stroke="#8A5A2B" stroke-width="4" stroke-linecap="round"/>`,
+carrinho:()=>`<path d="M10 22h34l-6 18H16z" fill="#E3C98F" ${OL}/><circle cx="46" cy="44" r="7" fill="#BDB4A6" ${OL}/><circle cx="46" cy="44" r="2.5" fill="#1F3B2B"/><path d="M6 16l6 6M44 22l10-8" stroke="#8A5A2B" stroke-width="4" stroke-linecap="round"/>`,
 galao:c=>`<rect x="16" y="16" width="26" height="36" rx="5" fill="${c}" ${OL}/><rect x="22" y="9" width="10" height="8" fill="#BDB4A6" ${OL}/>`,
 arvore:c=>`<rect x="27" y="34" width="6" height="18" fill="#8A5A2B" ${OL}/><circle cx="30" cy="24" r="16" fill="${c}" ${OL}/><circle cx="24" cy="21" r="4" fill="#fff" opacity=".25"/>`,
 flor:c=>`<path d="M30 54V30" stroke="#6B7F3F" stroke-width="4"/>`+[[30,12],[41,19],[37,31],[23,31],[19,19]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6.5" fill="${c}" ${OL}/>`).join('')+`<circle cx="30" cy="23" r="6" fill="#E3C98F" ${OL}/>`,
 cacho:c=>`<path d="M30 6v10" stroke="#6B7F3F" stroke-width="4"/>`+[[22,22],[30,22],[38,22],[26,31],[34,31],[30,40]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="6.5" fill="${c}" ${OL}/>`).join(''),
 pimenta:c=>`<path d="M20 20c4 18 14 28 26 30-2-14-10-26-26-30z" fill="${c}" ${OL}/><path d="M20 20l-4-6" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/>`,
-abacaxi:()=>`<ellipse cx="30" cy="38" rx="12" ry="16" fill="#E3C98F" ${OL}/><path d="M30 22l-8-12M30 22v-14M30 22l8-12" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/><path d="M22 32l16 12M38 32L22 44" stroke="#2B1810" stroke-width="1.5" opacity=".4"/>`,
+abacaxi:()=>`<ellipse cx="30" cy="38" rx="12" ry="16" fill="#E3C98F" ${OL}/><path d="M30 22l-8-12M30 22v-14M30 22l8-12" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/><path d="M22 32l16 12M38 32L22 44" stroke="#1F3B2B" stroke-width="1.5" opacity=".4"/>`,
 ovo:()=>`<ellipse cx="30" cy="34" rx="13" ry="17" fill="#F3EEE4" ${OL}/><ellipse cx="25" cy="28" rx="3" ry="5" fill="#fff" opacity=".6"/>`,
-galinha:()=>`<path d="M12 28l8 6-6 6z" fill="#BDB4A6" ${OL}/><ellipse cx="28" cy="36" rx="16" ry="13" fill="#F3EEE4" ${OL}/><circle cx="42" cy="22" r="8" fill="#F3EEE4" ${OL}/><path d="M49 21l7 3-7 3z" fill="#D9A06A" ${OL}/><circle cx="40" cy="21" r="2" fill="#2B1810"/><path d="M38 14c2-5 6-5 8 0" fill="#D9503F" stroke="#2B1810" stroke-width="2"/><path d="M26 50v5M32 50v5" stroke="#D9A06A" stroke-width="3"/>`,
-vaca:()=>`<rect x="8" y="24" width="34" height="18" rx="6" fill="#F3EEE4" ${OL}/><rect x="38" y="18" width="16" height="16" rx="5" fill="#F3EEE4" ${OL}/><ellipse cx="46" cy="32" rx="7" ry="4" fill="#E8A29A" ${OL}/><circle cx="44" cy="25" r="1.8" fill="#2B1810"/><path d="M40 18l-3-5M52 18l3-5" stroke="#BDB4A6" stroke-width="3"/><ellipse cx="20" cy="31" rx="5" ry="4" fill="#8A5A2B"/><ellipse cx="32" cy="35" rx="4" ry="3" fill="#8A5A2B"/><path d="M14 42v10M36 42v10" stroke="#BDB4A6" stroke-width="4"/>`,
-porco:()=>`<ellipse cx="28" cy="34" rx="19" ry="13" fill="#E8A29A" ${OL}/><circle cx="46" cy="32" r="9" fill="#E8A29A" ${OL}/><ellipse cx="53" cy="34" rx="4" ry="3" fill="#D98A82" ${OL}/><path d="M42 24l2-7 5 6z" fill="#E8A29A" ${OL}/><circle cx="45" cy="29" r="1.8" fill="#2B1810"/><path d="M14 44v9M30 46v8" stroke="#D98A82" stroke-width="4"/><path d="M9 30c-5-2-4-8 0-6" fill="none" stroke="#D98A82" stroke-width="2.5"/>`,
-cavalo:()=>`<path d="M40 26l4-16 12 6-4 14z" fill="#D9A06A" ${OL}/><ellipse cx="26" cy="32" rx="17" ry="10" fill="#D9A06A" ${OL}/><path d="M43 12c-6 2-9 8-8 14" fill="none" stroke="#8A5A2B" stroke-width="3.5"/><circle cx="51" cy="16" r="1.8" fill="#2B1810"/><path d="M14 40v13M22 41v13M32 41v13M39 38v15" stroke="#8A5A2B" stroke-width="4"/><path d="M9 28c-5 4-4 10-2 14" fill="none" stroke="#8A5A2B" stroke-width="3.5"/>`,
+galinha:()=>`<path d="M12 28l8 6-6 6z" fill="#BDB4A6" ${OL}/><ellipse cx="28" cy="36" rx="16" ry="13" fill="#F3EEE4" ${OL}/><circle cx="42" cy="22" r="8" fill="#F3EEE4" ${OL}/><path d="M49 21l7 3-7 3z" fill="#D9A06A" ${OL}/><circle cx="40" cy="21" r="2" fill="#1F3B2B"/><path d="M38 14c2-5 6-5 8 0" fill="#D9503F" stroke="#1F3B2B" stroke-width="2"/><path d="M26 50v5M32 50v5" stroke="#D9A06A" stroke-width="3"/>`,
+vaca:()=>`<rect x="8" y="24" width="34" height="18" rx="6" fill="#F3EEE4" ${OL}/><rect x="38" y="18" width="16" height="16" rx="5" fill="#F3EEE4" ${OL}/><ellipse cx="46" cy="32" rx="7" ry="4" fill="#E8A29A" ${OL}/><circle cx="44" cy="25" r="1.8" fill="#1F3B2B"/><path d="M40 18l-3-5M52 18l3-5" stroke="#BDB4A6" stroke-width="3"/><ellipse cx="20" cy="31" rx="5" ry="4" fill="#8A5A2B"/><ellipse cx="32" cy="35" rx="4" ry="3" fill="#8A5A2B"/><path d="M14 42v10M36 42v10" stroke="#BDB4A6" stroke-width="4"/>`,
+porco:()=>`<ellipse cx="28" cy="34" rx="19" ry="13" fill="#E8A29A" ${OL}/><circle cx="46" cy="32" r="9" fill="#E8A29A" ${OL}/><ellipse cx="53" cy="34" rx="4" ry="3" fill="#D98A82" ${OL}/><path d="M42 24l2-7 5 6z" fill="#E8A29A" ${OL}/><circle cx="45" cy="29" r="1.8" fill="#1F3B2B"/><path d="M14 44v9M30 46v8" stroke="#D98A82" stroke-width="4"/><path d="M9 30c-5-2-4-8 0-6" fill="none" stroke="#D98A82" stroke-width="2.5"/>`,
+cavalo:()=>`<path d="M40 26l4-16 12 6-4 14z" fill="#D9A06A" ${OL}/><ellipse cx="26" cy="32" rx="17" ry="10" fill="#D9A06A" ${OL}/><path d="M43 12c-6 2-9 8-8 14" fill="none" stroke="#8A5A2B" stroke-width="3.5"/><circle cx="51" cy="16" r="1.8" fill="#1F3B2B"/><path d="M14 40v13M22 41v13M32 41v13M39 38v15" stroke="#8A5A2B" stroke-width="4"/><path d="M9 28c-5 4-4 10-2 14" fill="none" stroke="#8A5A2B" stroke-width="3.5"/>`,
 ovelha:()=>`<circle cx="22" cy="30" r="9" fill="#F3EEE4" ${OL}/><circle cx="32" cy="26" r="9" fill="#F3EEE4" ${OL}/><circle cx="38" cy="34" r="9" fill="#F3EEE4" ${OL}/><circle cx="24" cy="38" r="9" fill="#F3EEE4" ${OL}/><ellipse cx="47" cy="28" rx="6" ry="7" fill="#8A5A2B" ${OL}/><circle cx="48" cy="26" r="1.5" fill="#fff"/><path d="M20 46v8M36 46v8" stroke="#8A5A2B" stroke-width="4"/>`,
-colmeia:()=>`<rect x="12" y="40" width="36" height="10" rx="2" fill="#E3C98F" ${OL}/><rect x="14" y="30" width="32" height="10" rx="2" fill="#D9A06A" ${OL}/><rect x="16" y="20" width="28" height="10" rx="2" fill="#E3C98F" ${OL}/><path d="M12 20l18-12 18 12z" fill="#8A5A2B" ${OL}/><rect x="26" y="42" width="8" height="4" fill="#2B1810"/>`,
-balde:()=>`<path d="M16 22h28l-3 28H19z" fill="#BDB4A6" ${OL}/><path d="M16 22c0-12 28-12 28 0" fill="none" stroke="#2B1810" stroke-width="3"/><path d="M19 32h22" stroke="#2B1810" stroke-width="1.5" opacity=".4"/>`,
+colmeia:()=>`<rect x="12" y="40" width="36" height="10" rx="2" fill="#E3C98F" ${OL}/><rect x="14" y="30" width="32" height="10" rx="2" fill="#D9A06A" ${OL}/><rect x="16" y="20" width="28" height="10" rx="2" fill="#E3C98F" ${OL}/><path d="M12 20l18-12 18 12z" fill="#8A5A2B" ${OL}/><rect x="26" y="42" width="8" height="4" fill="#1F3B2B"/>`,
+balde:()=>`<path d="M16 22h28l-3 28H19z" fill="#BDB4A6" ${OL}/><path d="M16 22c0-12 28-12 28 0" fill="none" stroke="#1F3B2B" stroke-width="3"/><path d="M19 32h22" stroke="#1F3B2B" stroke-width="1.5" opacity=".4"/>`,
 trator:()=>`<rect x="28" y="26" width="24" height="14" rx="3" fill="#D9773F" ${OL}/><rect x="12" y="12" width="18" height="20" rx="3" fill="#D9773F" ${OL}/><rect x="15" y="15" width="12" height="9" fill="#C9E0EC" ${OL}/><circle cx="20" cy="42" r="11" fill="#6B4A2E" ${OL}/><circle cx="20" cy="42" r="4" fill="#E3C98F"/><circle cx="46" cy="46" r="7" fill="#6B4A2E" ${OL}/><circle cx="46" cy="46" r="3" fill="#E3C98F"/>`,
-motosserra:()=>`<rect x="8" y="24" width="26" height="18" rx="5" fill="#D9773F" ${OL}/><path d="M16 24c0-8 12-8 12 0" fill="none" stroke="#2B1810" stroke-width="3"/><rect x="34" y="30" width="22" height="7" rx="3" fill="#BDB4A6" ${OL}/><path d="M38 33h14" stroke="#2B1810" stroke-width="2" stroke-dasharray="2 2"/>`,
-rocadeira:()=>`<path d="M12 50L40 20" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><circle cx="44" cy="16" r="9" fill="#BDB4A6" ${OL}/><path d="M38 16h12" stroke="#2B1810" stroke-width="2"/><rect x="6" y="46" width="14" height="9" rx="3" fill="#D9773F" ${OL}/>`,
-bomba:()=>`<circle cx="26" cy="34" r="16" fill="#8FB3C7" ${OL}/><rect x="38" y="26" width="16" height="10" fill="#BDB4A6" ${OL}/><circle cx="26" cy="34" r="5" fill="#fff" ${OL}/><rect x="14" y="48" width="24" height="6" rx="2" fill="#2B1810"/>`,
-caixa:()=>`<rect x="10" y="22" width="40" height="26" rx="4" fill="#D9773F" ${OL}/><path d="M22 22v-6h16v6" fill="none" stroke="#2B1810" stroke-width="3"/><rect x="26" y="32" width="8" height="6" fill="#E3C98F" ${OL}/>`,
+motosserra:()=>`<rect x="8" y="24" width="26" height="18" rx="5" fill="#D9773F" ${OL}/><path d="M16 24c0-8 12-8 12 0" fill="none" stroke="#1F3B2B" stroke-width="3"/><rect x="34" y="30" width="22" height="7" rx="3" fill="#BDB4A6" ${OL}/><path d="M38 33h14" stroke="#1F3B2B" stroke-width="2" stroke-dasharray="2 2"/>`,
+rocadeira:()=>`<path d="M12 50L40 20" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><circle cx="44" cy="16" r="9" fill="#BDB4A6" ${OL}/><path d="M38 16h12" stroke="#1F3B2B" stroke-width="2"/><rect x="6" y="46" width="14" height="9" rx="3" fill="#D9773F" ${OL}/>`,
+bomba:()=>`<circle cx="26" cy="34" r="16" fill="#8FB3C7" ${OL}/><rect x="38" y="26" width="16" height="10" fill="#BDB4A6" ${OL}/><circle cx="26" cy="34" r="5" fill="#fff" ${OL}/><rect x="14" y="48" width="24" height="6" rx="2" fill="#1F3B2B"/>`,
+caixa:()=>`<rect x="10" y="22" width="40" height="26" rx="4" fill="#D9773F" ${OL}/><path d="M22 22v-6h16v6" fill="none" stroke="#1F3B2B" stroke-width="3"/><rect x="26" y="32" width="8" height="6" fill="#E3C98F" ${OL}/>`,
 escada:()=>`<path d="M20 6v48M40 6v48" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/><path d="M20 16h20M20 28h20M20 40h20" stroke="#BDB4A6" stroke-width="4"/>`,
-prego:()=>`<rect x="22" y="8" width="16" height="6" rx="2" fill="#BDB4A6" ${OL}/><path d="M30 14v38" stroke="#BDB4A6" stroke-width="6"/><path d="M26 22l8 3M26 30l8 3M26 38l8 3" stroke="#2B1810" stroke-width="2"/>`,
+prego:()=>`<rect x="22" y="8" width="16" height="6" rx="2" fill="#BDB4A6" ${OL}/><path d="M30 14v38" stroke="#BDB4A6" stroke-width="6"/><path d="M26 22l8 3M26 30l8 3M26 38l8 3" stroke="#1F3B2B" stroke-width="2"/>`,
 lanterna:()=>`<rect x="22" y="24" width="16" height="26" rx="4" fill="#E3C98F" ${OL}/><path d="M20 14h20l-4 10H24z" fill="#BDB4A6" ${OL}/><path d="M30 5v4M18 9l3 3M42 9l-3 3" stroke="#E3C98F" stroke-width="3"/>`,
-barril:c=>`<ellipse cx="30" cy="16" rx="14" ry="5" fill="#BDB4A6" ${OL}/><path d="M16 16v32c0 6 28 6 28 0V16" fill="${c}" ${OL}/><path d="M16 28c0 6 28 6 28 0M16 38c0 6 28 6 28 0" fill="none" stroke="#2B1810" stroke-width="2"/>`,
-seringa:()=>`<rect x="16" y="26" width="26" height="10" rx="3" fill="#F3EEE4" ${OL}/><rect x="42" y="29" width="12" height="4" fill="#BDB4A6" ${OL}/><rect x="8" y="22" width="4" height="18" fill="#BDB4A6" ${OL}/><path d="M12 31h4" stroke="#2B1810" stroke-width="3"/><rect x="22" y="28" width="10" height="6" fill="#E8A29A"/>`,
+barril:c=>`<ellipse cx="30" cy="16" rx="14" ry="5" fill="#BDB4A6" ${OL}/><path d="M16 16v32c0 6 28 6 28 0V16" fill="${c}" ${OL}/><path d="M16 28c0 6 28 6 28 0M16 38c0 6 28 6 28 0" fill="none" stroke="#1F3B2B" stroke-width="2"/>`,
+seringa:()=>`<rect x="16" y="26" width="26" height="10" rx="3" fill="#F3EEE4" ${OL}/><rect x="42" y="29" width="12" height="4" fill="#BDB4A6" ${OL}/><rect x="8" y="22" width="4" height="18" fill="#BDB4A6" ${OL}/><path d="M12 31h4" stroke="#1F3B2B" stroke-width="3"/><rect x="22" y="28" width="10" height="6" fill="#E8A29A"/>`,
 aerador:()=>`<rect x="14" y="30" width="32" height="16" rx="4" fill="#BDB4A6" ${OL}/><circle cx="22" cy="20" r="5" fill="#C9E0EC" ${OL}/><circle cx="34" cy="12" r="4" fill="#C9E0EC" ${OL}/><circle cx="40" cy="22" r="3" fill="#C9E0EC" ${OL}/>`,
 termometro:()=>`<rect x="26" y="8" width="8" height="34" rx="4" fill="#fff" ${OL}/><circle cx="30" cy="46" r="8" fill="#D9503F" ${OL}/><rect x="29" y="22" width="2" height="22" fill="#D9503F"/>`,
-rede:()=>`<path d="M10 14h40M16 24h28M22 34h16M20 14l6 24M30 14v28M40 14l-6 24" stroke="#8FB3C7" stroke-width="2.5" fill="none"/><path d="M10 14c0 30 40 30 40 0" fill="none" stroke="#2B1810" stroke-width="2.5"/><path d="M30 44v10" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/>`,
-peixec:c=>`<ellipse cx="28" cy="32" rx="20" ry="12" fill="${c}" ${OL}/><polygon points="46,32 58,22 58,42" fill="${c}" ${OL}/><circle cx="19" cy="29" r="3" fill="#2B1810"/>`,
+rede:()=>`<path d="M10 14h40M16 24h28M22 34h16M20 14l6 24M30 14v28M40 14l-6 24" stroke="#8FB3C7" stroke-width="2.5" fill="none"/><path d="M10 14c0 30 40 30 40 0" fill="none" stroke="#1F3B2B" stroke-width="2.5"/><path d="M30 44v10" stroke="#8A5A2B" stroke-width="5" stroke-linecap="round"/>`,
+peixec:c=>`<ellipse cx="28" cy="32" rx="20" ry="12" fill="${c}" ${OL}/><polygon points="46,32 58,22 58,42" fill="${c}" ${OL}/><circle cx="19" cy="29" r="3" fill="#1F3B2B"/>`,
 raio:()=>`<polygon points="34,6 16,34 28,34 24,56 44,26 31,26" fill="#E3C98F" ${OL}/>`,
 tanque:()=>`<path d="M10 24h40v20c0 6-40 6-40 0z" fill="#8FB3C7" ${OL}/><ellipse cx="30" cy="24" rx="20" ry="6" fill="#C9E0EC" ${OL}/>`,
 maca:()=>`<path d="M30 21c-7-6-17 0-15 12 2 12 9 19 15 16 6 3 13-4 15-16 2-12-8-18-15-12z" fill="#D9503F" ${OL}/><path d="M30 21v-9" stroke="#8A5A2B" stroke-width="3" stroke-linecap="round"/><path d="M31 15c4-5 9-4 11-2-2 4-7 5-11 2z" fill="#A9B58A" ${OL}/>`,
 laranja:()=>`<circle cx="30" cy="34" r="17" fill="#E69A3A" ${OL}/><path d="M30 17c4-6 10-6 13-3-3 5-9 6-13 3z" fill="#A9B58A" ${OL}/><circle cx="24" cy="29" r="3" fill="#fff" opacity=".3"/>`,
 limao:()=>`<ellipse cx="30" cy="32" rx="19" ry="14" fill="#F0D77A" ${OL}/><circle cx="10" cy="32" r="3.5" fill="#F0D77A" ${OL}/><circle cx="50" cy="32" r="3.5" fill="#F0D77A" ${OL}/><ellipse cx="24" cy="27" rx="5" ry="2.5" fill="#fff" opacity=".35"/>`,
-melancia:()=>`<path d="M7 22a23 23 0 0 0 46 0z" fill="#6B7F3F" ${OL}/><path d="M11 22a19 19 0 0 0 38 0z" fill="#E8605A"/><path d="M11 22a19 19 0 0 0 38 0" fill="none" stroke="#F3EEE4" stroke-width="2"/><circle cx="24" cy="31" r="1.8" fill="#2B1810"/><circle cx="32" cy="36" r="1.8" fill="#2B1810"/><circle cx="38" cy="29" r="1.8" fill="#2B1810"/><circle cx="30" cy="27" r="1.8" fill="#2B1810"/>`,
+melancia:()=>`<path d="M7 22a23 23 0 0 0 46 0z" fill="#6B7F3F" ${OL}/><path d="M11 22a19 19 0 0 0 38 0z" fill="#E8605A"/><path d="M11 22a19 19 0 0 0 38 0" fill="none" stroke="#F3EEE4" stroke-width="2"/><circle cx="24" cy="31" r="1.8" fill="#1F3B2B"/><circle cx="32" cy="36" r="1.8" fill="#1F3B2B"/><circle cx="38" cy="29" r="1.8" fill="#1F3B2B"/><circle cx="30" cy="27" r="1.8" fill="#1F3B2B"/>`,
 morango:()=>`<path d="M30 52C14 40 11 26 17 21c6-4 20-4 26 0 6 5 3 19-13 31z" fill="#D9503F" ${OL}/><path d="M21 20l9-8 9 8-9 3z" fill="#6B7F3F" ${OL}/><g fill="#F0D77A"><circle cx="23" cy="29" r="1.4"/><circle cx="31" cy="28" r="1.4"/><circle cx="38" cy="30" r="1.4"/><circle cx="27" cy="36" r="1.4"/><circle cx="34" cy="37" r="1.4"/><circle cx="30" cy="44" r="1.4"/></g>`,
 abacate:()=>`<path d="M30 7c8 0 10 12 14 22 3 10-4 23-14 23S13 39 16 29C20 19 22 7 30 7z" fill="#4F6B2E" ${OL}/><path d="M30 13c6 0 8 10 11 18 2 8-3 16-11 16s-13-8-11-16c3-8 5-18 11-18z" fill="#D8E2A8"/><circle cx="30" cy="36" r="8" fill="#8A5A2B" ${OL}/>`,
 pera:()=>`<path d="M30 10c6 0 8 8 8 14 8 4 10 14 6 22-4 8-24 8-28 0-4-8-2-18 6-22 0-6 2-14 8-14z" fill="#C9D4A8" ${OL}/><path d="M30 10V4" stroke="#8A5A2B" stroke-width="3" stroke-linecap="round"/><ellipse cx="24" cy="38" rx="3" ry="6" fill="#fff" opacity=".3"/>`,
-coco:()=>`<circle cx="30" cy="32" r="18" fill="#8A5A2B" ${OL}/><circle cx="24" cy="28" r="2.6" fill="#2B1810"/><circle cx="34" cy="28" r="2.6" fill="#2B1810"/><ellipse cx="29" cy="37" rx="2.6" ry="3.6" fill="#2B1810"/>`,
+coco:()=>`<circle cx="30" cy="32" r="18" fill="#8A5A2B" ${OL}/><circle cx="24" cy="28" r="2.6" fill="#1F3B2B"/><circle cx="34" cy="28" r="2.6" fill="#1F3B2B"/><ellipse cx="29" cy="37" rx="2.6" ry="3.6" fill="#1F3B2B"/>`,
 manga:()=>`<path d="M14 30c0-12 14-18 25-12 11 6 10 22 0 28-10 6-25-2-25-16z" fill="#E69A3A" ${OL}/><path d="M28 19c2-6 9-8 13-6-2 6-9 8-13 6z" fill="#6B7F3F" ${OL}/><path d="M20 37c4 6 12 8 19 4" fill="none" stroke="#D9503F" stroke-width="5" opacity=".6"/>`,
-mamao:()=>`<path d="M30 7c14 4 20 22 14 35-4 9-20 9-24 0C14 29 16 11 30 7z" fill="#E69A3A" ${OL}/><ellipse cx="30" cy="31" rx="6.5" ry="13" fill="#D9503F" ${OL}/><g fill="#2B1810"><circle cx="28" cy="26" r="1.5"/><circle cx="32" cy="31" r="1.5"/><circle cx="28" cy="36" r="1.5"/></g>`,
+mamao:()=>`<path d="M30 7c14 4 20 22 14 35-4 9-20 9-24 0C14 29 16 11 30 7z" fill="#E69A3A" ${OL}/><ellipse cx="30" cy="31" rx="6.5" ry="13" fill="#D9503F" ${OL}/><g fill="#1F3B2B"><circle cx="28" cy="26" r="1.5"/><circle cx="32" cy="31" r="1.5"/><circle cx="28" cy="36" r="1.5"/></g>`,
 pessego:()=>`<circle cx="30" cy="34" r="17" fill="#F2B28A" ${OL}/><path d="M30 18c-5 9-5 19 0 32" fill="none" stroke="#D9773F" stroke-width="2.5"/><path d="M31 18c4-6 10-6 13-3-3 5-9 6-13 3z" fill="#A9B58A" ${OL}/>`,
 cereja:()=>`<path d="M20 38L31 8l11 32" fill="none" stroke="#6B7F3F" stroke-width="3"/><circle cx="20" cy="43" r="9" fill="#B03A48" ${OL}/><circle cx="42" cy="44" r="9" fill="#B03A48" ${OL}/><circle cx="17" cy="40" r="2" fill="#fff" opacity=".4"/><circle cx="39" cy="41" r="2" fill="#fff" opacity=".4"/>`,
 banana:()=>`<path d="M9 20c3 23 24 33 42 24-3-4-5-6-7-6-12 4-21-3-26-20z" fill="#F0D77A" ${OL}/><path d="M9 20l5-3" stroke="#8A5A2B" stroke-width="4" stroke-linecap="round"/>`,
@@ -205,33 +205,33 @@ laranja:c=>`<circle cx="30" cy="33" r="17" fill="${c}" ${OL}/><circle cx="30" cy
 limao:c=>`<ellipse cx="30" cy="32" rx="21" ry="14" fill="${c}" ${OL}/><circle cx="8" cy="32" r="3" fill="${c}" ${OL}/><circle cx="52" cy="32" r="3" fill="${c}" ${OL}/><path d="M20 26c4-3 9-4 13-3" stroke="#fff" stroke-width="2.5" opacity=".45" fill="none" stroke-linecap="round"/>`,
 banana:c=>`<path d="M12 18C14 38 30 50 50 46" stroke="${c}" stroke-width="13" stroke-linecap="round" fill="none"/><path d="M12 18l-2-7" stroke="#8A5A2B" stroke-width="4" stroke-linecap="round"/><path d="M16 22C18 36 30 44 44 43" stroke="#fff" stroke-width="2" opacity=".35" fill="none" stroke-linecap="round"/>`,
 morango:c=>`<path d="M30 52C14 42 10 28 14 22c4-6 12-4 16-2 4-2 12-4 16 2 4 6 0 20-16 30z" fill="${c}" ${OL}/><path d="M18 18c4-4 8-2 12 0 4-2 8-4 12 0-4 6-8 6-12 4-4 2-8 2-12-4z" fill="#A9B58A" ${OL}/><g fill="#F3EEE4"><circle cx="24" cy="30" r="1.5"/><circle cx="36" cy="30" r="1.5"/><circle cx="30" cy="36" r="1.5"/><circle cx="26" cy="42" r="1.5"/><circle cx="34" cy="42" r="1.5"/></g>`,
-melancia:()=>`<path d="M6 24h48c0 18-10 30-24 30S6 42 6 24z" fill="#A9B58A" ${OL}/><path d="M11 24h38c0 14-8 24-19 24S11 38 11 24z" fill="#D9503F" ${OL}/><g fill="#2B1810"><ellipse cx="24" cy="32" rx="1.6" ry="2.4"/><ellipse cx="36" cy="32" rx="1.6" ry="2.4"/><ellipse cx="30" cy="38" rx="1.6" ry="2.4"/></g>`,
+melancia:()=>`<path d="M6 24h48c0 18-10 30-24 30S6 42 6 24z" fill="#A9B58A" ${OL}/><path d="M11 24h38c0 14-8 24-19 24S11 38 11 24z" fill="#D9503F" ${OL}/><g fill="#1F3B2B"><ellipse cx="24" cy="32" rx="1.6" ry="2.4"/><ellipse cx="36" cy="32" rx="1.6" ry="2.4"/><ellipse cx="30" cy="38" rx="1.6" ry="2.4"/></g>`,
 manga:c=>`<path d="M14 36c0-14 10-22 24-22 8 0 12 6 10 14-2 12-12 22-22 20-8-2-12-6-12-12z" fill="${c}" ${OL}/><path d="M38 14c2-5 8-7 12-4-3 4-8 6-12 4z" fill="#A9B58A" ${OL}/><path d="M22 40c4 4 10 4 14 0" stroke="#fff" stroke-width="2.5" opacity=".4" fill="none" stroke-linecap="round"/>`,
-coco:()=>`<circle cx="30" cy="32" r="18" fill="#8A5A2B" ${OL}/><circle cx="24" cy="26" r="2.3" fill="#2B1810"/><circle cx="34" cy="26" r="2.3" fill="#2B1810"/><circle cx="29" cy="33" r="2.3" fill="#2B1810"/><path d="M20 24c4-6 10-8 16-6" stroke="#E3C98F" stroke-width="2.5" opacity=".5" fill="none" stroke-linecap="round"/>`,
+coco:()=>`<circle cx="30" cy="32" r="18" fill="#8A5A2B" ${OL}/><circle cx="24" cy="26" r="2.3" fill="#1F3B2B"/><circle cx="34" cy="26" r="2.3" fill="#1F3B2B"/><circle cx="29" cy="33" r="2.3" fill="#1F3B2B"/><path d="M20 24c4-6 10-8 16-6" stroke="#E3C98F" stroke-width="2.5" opacity=".5" fill="none" stroke-linecap="round"/>`,
 abacate:c=>`<path d="M30 10c-6 0-9 8-10 14-1 5-8 8-8 16 0 8 8 13 18 13s18-5 18-13c0-8-7-11-8-16-1-6-4-14-10-14z" fill="${c}" ${OL}/><circle cx="30" cy="38" r="8" fill="#8A5A2B" ${OL}/>`,
 cereja:c=>`<path d="M18 32C20 20 26 12 32 10M42 34C40 22 36 14 32 10" fill="none" stroke="#6B7F3F" stroke-width="3" stroke-linecap="round"/><circle cx="18" cy="42" r="10" fill="${c}" ${OL}/><circle cx="42" cy="44" r="10" fill="${c}" ${OL}/><path d="M32 10c4-3 10-2 12 2-4 3-9 3-12-2z" fill="#A9B58A" ${OL}/>`,
-pessego:c=>`<circle cx="30" cy="34" r="18" fill="${c}" ${OL}/><path d="M30 17c-6 8-6 22 0 34" fill="none" stroke="#2B1810" stroke-width="2" opacity=".4"/><path d="M31 17c3-6 10-8 14-4-4 5-10 7-14 4z" fill="#A9B58A" ${OL}/>`,
-batata:c=>`<path d="M10 34c0-12 12-18 24-16 12 2 20 8 16 20-4 12-20 14-30 8-6-4-10-6-10-12z" fill="${c}" ${OL}/><g fill="#2B1810" opacity=".45"><circle cx="22" cy="30" r="1.6"/><circle cx="36" cy="26" r="1.6"/><circle cx="32" cy="40" r="1.6"/><circle cx="42" cy="36" r="1.6"/></g>`,
+pessego:c=>`<circle cx="30" cy="34" r="18" fill="${c}" ${OL}/><path d="M30 17c-6 8-6 22 0 34" fill="none" stroke="#1F3B2B" stroke-width="2" opacity=".4"/><path d="M31 17c3-6 10-8 14-4-4 5-10 7-14 4z" fill="#A9B58A" ${OL}/>`,
+batata:c=>`<path d="M10 34c0-12 12-18 24-16 12 2 20 8 16 20-4 12-20 14-30 8-6-4-10-6-10-12z" fill="${c}" ${OL}/><g fill="#1F3B2B" opacity=".45"><circle cx="22" cy="30" r="1.6"/><circle cx="36" cy="26" r="1.6"/><circle cx="32" cy="40" r="1.6"/><circle cx="42" cy="36" r="1.6"/></g>`,
 mandioca:c=>`<path d="M8 46C22 44 36 30 44 14c6-4 10 0 8 6C44 36 30 50 14 54c-6 0-8-6-6-8z" fill="${c}" ${OL}/><path d="M44 14c2-2 6-2 8 2" stroke="#F3EEE4" stroke-width="3" fill="none" stroke-linecap="round"/>`,
-cebola:c=>`<path d="M30 8c0 6-2 8-2 12" stroke="#6B7F3F" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M30 18c-12 0-18 10-18 20 0 8 8 14 18 14s18-6 18-14c0-10-6-20-18-20z" fill="${c}" ${OL}/><path d="M30 18c-5 8-5 26 0 34M30 18c5 8 5 26 0 34" stroke="#2B1810" stroke-width="1.5" opacity=".3" fill="none"/><path d="M26 52l-2 4M30 52v4M34 52l2 4" stroke="#BDB4A6" stroke-width="2" stroke-linecap="round"/>`,
-alho:c=>`<path d="M30 8c0 6 0 10-2 14" stroke="#BDB4A6" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M30 20c-10 0-18 8-18 20 0 8 8 12 18 12s18-4 18-12c0-12-8-20-18-20z" fill="${c}" ${OL}/><path d="M30 22c-4 8-4 24 0 30M22 26c-4 8-2 20 2 24M38 26c4 8 2 20-2 24" stroke="#2B1810" stroke-width="1.5" opacity=".3" fill="none"/>`,
-repolho:c=>`<circle cx="30" cy="32" r="19" fill="${c}" ${OL}/><path d="M30 13c-8 6-8 32 0 38M30 13c8 6 8 32 0 38M12 28c10 6 26 6 36 0" stroke="#2B1810" stroke-width="1.8" opacity=".35" fill="none"/>`,
+cebola:c=>`<path d="M30 8c0 6-2 8-2 12" stroke="#6B7F3F" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M30 18c-12 0-18 10-18 20 0 8 8 14 18 14s18-6 18-14c0-10-6-20-18-20z" fill="${c}" ${OL}/><path d="M30 18c-5 8-5 26 0 34M30 18c5 8 5 26 0 34" stroke="#1F3B2B" stroke-width="1.5" opacity=".3" fill="none"/><path d="M26 52l-2 4M30 52v4M34 52l2 4" stroke="#BDB4A6" stroke-width="2" stroke-linecap="round"/>`,
+alho:c=>`<path d="M30 8c0 6 0 10-2 14" stroke="#BDB4A6" stroke-width="3.5" stroke-linecap="round" fill="none"/><path d="M30 20c-10 0-18 8-18 20 0 8 8 12 18 12s18-4 18-12c0-12-8-20-18-20z" fill="${c}" ${OL}/><path d="M30 22c-4 8-4 24 0 30M22 26c-4 8-2 20 2 24M38 26c4 8 2 20-2 24" stroke="#1F3B2B" stroke-width="1.5" opacity=".3" fill="none"/>`,
+repolho:c=>`<circle cx="30" cy="32" r="19" fill="${c}" ${OL}/><path d="M30 13c-8 6-8 32 0 38M30 13c8 6 8 32 0 38M12 28c10 6 26 6 36 0" stroke="#1F3B2B" stroke-width="1.8" opacity=".35" fill="none"/>`,
 brocolis:c=>`<path d="M26 54V38M34 54V38M30 54V34" stroke="#A9B58A" stroke-width="5" stroke-linecap="round"/><circle cx="20" cy="30" r="9" fill="${c}" ${OL}/><circle cx="40" cy="30" r="9" fill="${c}" ${OL}/><circle cx="30" cy="22" r="10" fill="${c}" ${OL}/>`,
 pepino:c=>`<g transform="rotate(-25 30 32)"><rect x="6" y="24" width="48" height="16" rx="8" fill="${c}" ${OL}/><g fill="#fff" opacity=".4"><circle cx="18" cy="32" r="1.6"/><circle cx="30" cy="30" r="1.6"/><circle cx="42" cy="34" r="1.6"/></g></g>`,
-abobora:c=>`<path d="M30 14v-4" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/><ellipse cx="30" cy="34" rx="22" ry="17" fill="${c}" ${OL}/><path d="M30 17c-8 6-8 28 0 34M30 17c8 6 8 28 0 34M18 20c-6 8-4 22 2 28M42 20c6 8 4 22-2 28" stroke="#2B1810" stroke-width="1.6" opacity=".35" fill="none"/>`,
+abobora:c=>`<path d="M30 14v-4" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/><ellipse cx="30" cy="34" rx="22" ry="17" fill="${c}" ${OL}/><path d="M30 17c-8 6-8 28 0 34M30 17c8 6 8 28 0 34M18 20c-6 8-4 22 2 28M42 20c6 8 4 22-2 28" stroke="#1F3B2B" stroke-width="1.6" opacity=".35" fill="none"/>`,
 berinjela:c=>`<path d="M42 12c8 8 6 22-4 32-8 8-20 12-26 6-4-6 0-14 8-22 6-6 10-14 14-18 2-2 6-2 8 2z" fill="${c}" ${OL}/><path d="M40 8c4 0 8 2 10 6l-8 2-6-2z" fill="#6B7F3F" ${OL}/>`,
-pimentao:c=>`<path d="M30 14v-4" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/><path d="M14 26c0-8 8-12 16-10 8-2 16 2 16 10 0 14-4 26-16 28C18 52 14 40 14 26z" fill="${c}" ${OL}/><path d="M24 22c-2 8-2 18 2 26M36 22c2 8 2 18-2 26" stroke="#2B1810" stroke-width="1.5" opacity=".3" fill="none"/>`,
-vagem:c=>`<path d="M8 44C20 44 40 32 50 12" stroke="${c}" stroke-width="12" stroke-linecap="round" fill="none"/><path d="M8 44C20 44 40 32 50 12" stroke="#2B1810" stroke-width="1.5" opacity=".35" fill="none" stroke-linecap="round" stroke-dasharray="1 7"/>`,
-cana:c=>`<path d="M20 54V14M32 54V10M44 54V16" stroke="${c}" stroke-width="7"/><path d="M16 26h8M16 40h8M28 24h8M28 38h8M40 28h8M40 42h8" stroke="#2B1810" stroke-width="2" opacity=".5"/><path d="M32 10c-6-2-12 0-16 6M32 10c6-2 12 0 16 6" stroke="#6B7F3F" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
+pimentao:c=>`<path d="M30 14v-4" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/><path d="M14 26c0-8 8-12 16-10 8-2 16 2 16 10 0 14-4 26-16 28C18 52 14 40 14 26z" fill="${c}" ${OL}/><path d="M24 22c-2 8-2 18 2 26M36 22c2 8 2 18-2 26" stroke="#1F3B2B" stroke-width="1.5" opacity=".3" fill="none"/>`,
+vagem:c=>`<path d="M8 44C20 44 40 32 50 12" stroke="${c}" stroke-width="12" stroke-linecap="round" fill="none"/><path d="M8 44C20 44 40 32 50 12" stroke="#1F3B2B" stroke-width="1.5" opacity=".35" fill="none" stroke-linecap="round" stroke-dasharray="1 7"/>`,
+cana:c=>`<path d="M20 54V14M32 54V10M44 54V16" stroke="${c}" stroke-width="7"/><path d="M16 26h8M16 40h8M28 24h8M28 38h8M40 28h8M40 42h8" stroke="#1F3B2B" stroke-width="2" opacity=".5"/><path d="M32 10c-6-2-12 0-16 6M32 10c6-2 12 0 16 6" stroke="#6B7F3F" stroke-width="3.5" fill="none" stroke-linecap="round"/>`,
 girassol:()=>`<path d="M30 54V34" stroke="#6B7F3F" stroke-width="4"/>`+[0,45,90,135,180,225,270,315].map(a=>`<ellipse cx="30" cy="12" rx="4" ry="8" transform="rotate(${a} 30 24)" fill="#E3C98F" ${OL}/>`).join('')+`<circle cx="30" cy="24" r="8" fill="#8A5A2B" ${OL}/>`,
 cogumelo:c=>`<path d="M10 32c0-12 10-20 20-20s20 8 20 20z" fill="${c}" ${OL}/><rect x="24" y="32" width="12" height="18" rx="4" fill="#F3EEE4" ${OL}/><g fill="#fff" opacity=".7"><circle cx="22" cy="26" r="3"/><circle cx="34" cy="20" r="3"/><circle cx="40" cy="28" r="2.5"/></g>`,
-cacto:c=>`<rect x="22" y="12" width="16" height="42" rx="8" fill="${c}" ${OL}/><path d="M22 34h-6c-4 0-6-2-6-6v-6M38 28h6c4 0 6-2 6-6v-6" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M30 16v34" stroke="#2B1810" stroke-width="1.5" opacity=".3"/>`,
+cacto:c=>`<rect x="22" y="12" width="16" height="42" rx="8" fill="${c}" ${OL}/><path d="M22 34h-6c-4 0-6-2-6-6v-6M38 28h6c4 0 6-2 6-6v-6" stroke="${c}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M30 16v34" stroke="#1F3B2B" stroke-width="1.5" opacity=".3"/>`,
 palmeira:()=>`<path d="M30 54c0-12 2-22 0-34" stroke="#8A5A2B" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M30 20c-10-10-20-8-24-2 8-2 16 0 24 2zM30 20c10-10 20-8 24-2-8-2-16 0-24 2zM30 20c-6-8-6-14-2-16 2 6 2 10 2 16zM30 20c6-8 6-14 2-16-2 6-2 10-2 16z" fill="#A9B58A" ${OL}/>`,
 cafe:()=>`<path d="M8 50C20 40 36 26 52 14" stroke="#8A5A2B" stroke-width="4" stroke-linecap="round" fill="none"/><path d="M20 40c-2-10 4-16 12-16-2 8-4 14-12 16zM36 28c0-10 6-14 14-12-2 8-6 12-14 12z" fill="#A9B58A" ${OL}/><circle cx="26" cy="46" r="5" fill="#D9503F" ${OL}/><circle cx="34" cy="48" r="5" fill="#D9503F" ${OL}/><circle cx="42" cy="38" r="5" fill="#D9503F" ${OL}/>`,
-cacau:c=>`<path d="M8 32c6-14 22-20 44-14-4 18-18 28-34 28-6 0-10-6-10-14z" fill="${c}" ${OL}/><path d="M16 36c8-10 20-14 32-14M14 28c10-6 20-8 30-6" stroke="#2B1810" stroke-width="1.5" opacity=".35" fill="none"/>`,
+cacau:c=>`<path d="M8 32c6-14 22-20 44-14-4 18-18 28-34 28-6 0-10-6-10-14z" fill="${c}" ${OL}/><path d="M16 36c8-10 20-14 32-14M14 28c10-6 20-8 30-6" stroke="#1F3B2B" stroke-width="1.5" opacity=".35" fill="none"/>`,
 alecrim:c=>`<path d="M30 54V8" stroke="#6B7F3F" stroke-width="3.5" stroke-linecap="round"/>`+[[22,16],[38,16],[22,28],[38,28],[22,40],[38,40]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="3.5" ry="8" transform="rotate(${x<30?-30:30} ${x} ${y})" fill="${c}" ${OL}/>`).join(''),
 trevo:c=>`<path d="M30 54V36" stroke="#6B7F3F" stroke-width="4" stroke-linecap="round"/><circle cx="22" cy="24" r="9" fill="${c}" ${OL}/><circle cx="38" cy="24" r="9" fill="${c}" ${OL}/><circle cx="22" cy="38" r="9" fill="${c}" ${OL}/><circle cx="38" cy="38" r="9" fill="${c}" ${OL}/>`,
-bambu:c=>`<path d="M22 54V6M38 54V14" stroke="${c}" stroke-width="8"/><path d="M18 18h8M18 34h8M18 48h8M34 24h8M34 40h8" stroke="#2B1810" stroke-width="2" opacity=".5"/><path d="M38 14c6-2 10 0 14 4M22 6c-6 0-10 2-14 6" stroke="#6B7F3F" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+bambu:c=>`<path d="M22 54V6M38 54V14" stroke="${c}" stroke-width="8"/><path d="M18 18h8M18 34h8M18 48h8M34 24h8M34 40h8" stroke="#1F3B2B" stroke-width="2" opacity=".5"/><path d="M38 14c6-2 10 0 14 4M22 6c-6 0-10 2-14 6" stroke="#6B7F3F" stroke-width="3" fill="none" stroke-linecap="round"/>`,
 pinheiro:c=>`<rect x="27" y="44" width="6" height="10" fill="#8A5A2B" ${OL}/><polygon points="30,6 46,28 38,28 50,44 10,44 22,28 14,28" fill="${c}" ${OL}/>`};
 const KW=[
 [/cebolinha|cebolete|alho.?poro/,'folha','#8FAA6A'],[/pimentao/,'pimentao','#D9503F'],
@@ -282,17 +282,17 @@ const slug=s=>norm(s).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'item';
 const hashN=s=>{let h=0;for(const ch of s)h=(h*31+ch.charCodeAt(0))|0;return Math.abs(h)};
 function calc(nome,kind){
   const n=norm(nome),l=(String(nome).trim()[0]||'?').toUpperCase();
-  for(const [re,g,cor] of KW)if(re.test(n))return {g,cor:cor||'#C9A25B',l};
-  const cores=['#C9A25B','#A9B58A','#E8A29A','#8FB3C7','#D9A06A','#BDB4A6','#C9D4A8','#E3C98F'];
+  for(const [re,g,cor] of KW)if(re.test(n))return {g,cor:cor||'#6E9A5A',l};
+  const cores=['#6E9A5A','#A9B58A','#E8A29A','#8FB3C7','#D9A06A','#BDB4A6','#C9D4A8','#E3C98F'];
   return {g:kind==='peixe'?'peixec':kind==='planta'?'folha':kind==='ferramenta'?'engrenagem':kind==='insumo'?'sacoc':'cristal',cor:cores[hashN(n)%cores.length],l};
 }
 let holos={};
 const H=(nome,kind)=>holos[slug(nome)]||calc(nome,kind);
 async function ensureHolo(nome,kind){const k=slug(nome);if(holos[k])return;const h=calc(nome,kind);holos[k]=h;await setDoc(doc(db,'sitios',sid,'hologramas',k),{...h,nome,criadoEm:Date.now()})}
-const glyph=h=>{const x=typeof h==='string'?{g:h}:h;return GL[x.g]||(GEN[x.g]||GEN.cristal)(x.cor||'#C9A25B',x.l||'?')};
-const mini=(h,s=50)=>`<div class="b" style="width:${s+6}px;height:${s+6}px;background:#2B1810"><svg viewBox="0 0 60 60" width="${s}" height="${s}" aria-hidden="true"><ellipse cx="30" cy="55" rx="20" ry="4" fill="#C9A25B" opacity=".5"/>${glyph(h)}</svg></div>`;
-const PLOTS=`<polygon points="150,60 188,80 150,100 112,80" fill="#8A5A2B" stroke="#2B1810" stroke-width="3"/><circle cx="150" cy="76" r="7" fill="#E8A29A" stroke="#2B1810" stroke-width="2"/><circle cx="133" cy="82" r="6" fill="#D9773F" stroke="#2B1810" stroke-width="2"/><circle cx="167" cy="82" r="6" fill="#E3C98F" stroke="#2B1810" stroke-width="2"/><path d="M150 76v-14M133 82v-12M167 82v-12" stroke="#6B7F3F" stroke-width="4"/>`;
-const island=(inner,w)=>`<div class="h"><svg viewBox="0 0 300 200" width="${w}" height="${w*2/3}" role="img" aria-label="Holograma flutuante"><defs><linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#C9A25B" stop-opacity=".55"/><stop offset="1" stop-color="#C9A25B" stop-opacity="0"/></linearGradient></defs><polygon points="70,186 230,186 200,100 100,100" fill="url(#bm)"/><ellipse cx="150" cy="186" rx="90" ry="12" fill="#C9A25B" opacity=".4" stroke="#B8893B" stroke-width="2"/><g class="fl"><polygon points="76,98 224,98 150,164" fill="#4A2E20" stroke="#2B1810" stroke-width="3" stroke-linejoin="round"/><polygon points="150,50 232,92 150,134 68,92" fill="#F3EEE4" stroke="#2B1810" stroke-width="3" stroke-linejoin="round"/>${inner}</g></svg></div>`;
+const glyph=h=>{const x=typeof h==='string'?{g:h}:h;return GL[x.g]||(GEN[x.g]||GEN.cristal)(x.cor||'#6E9A5A',x.l||'?')};
+const mini=(h,s=50)=>`<div class="b" style="width:${s+6}px;height:${s+6}px;background:#1F3B2B"><svg viewBox="0 0 60 60" width="${s}" height="${s}" aria-hidden="true"><ellipse cx="30" cy="55" rx="20" ry="4" fill="#6E9A5A" opacity=".5"/>${glyph(h)}</svg></div>`;
+const PLOTS=`<polygon points="150,60 188,80 150,100 112,80" fill="#8A5A2B" stroke="#1F3B2B" stroke-width="3"/><circle cx="150" cy="76" r="7" fill="#E8A29A" stroke="#1F3B2B" stroke-width="2"/><circle cx="133" cy="82" r="6" fill="#D9773F" stroke="#1F3B2B" stroke-width="2"/><circle cx="167" cy="82" r="6" fill="#E3C98F" stroke="#1F3B2B" stroke-width="2"/><path d="M150 76v-14M133 82v-12M167 82v-12" stroke="#6B7F3F" stroke-width="4"/>`;
+const island=(inner,w)=>`<div class="h"><svg viewBox="0 0 300 200" width="${w}" height="${w*2/3}" role="img" aria-label="Holograma flutuante"><defs><linearGradient id="bm" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#6E9A5A" stop-opacity=".55"/><stop offset="1" stop-color="#6E9A5A" stop-opacity="0"/></linearGradient></defs><polygon points="70,186 230,186 200,100 100,100" fill="url(#bm)"/><ellipse cx="150" cy="186" rx="90" ry="12" fill="#6E9A5A" opacity=".4" stroke="#4F8A4B" stroke-width="2"/><g class="fl"><polygon points="76,98 224,98 150,164" fill="#2F5A41" stroke="#1F3B2B" stroke-width="3" stroke-linejoin="round"/><polygon points="150,50 232,92 150,134 68,92" fill="#F3EEE4" stroke="#1F3B2B" stroke-width="3" stroke-linejoin="round"/>${inner}</g></svg></div>`;
 const big=h=>`<g transform="translate(110,30) scale(1.3)">${glyph(h)}</g>`;
 
 /* ---------- dicas da tela de abertura ---------- */
@@ -323,7 +323,7 @@ const DICAS=[
 'Observe o caminho da água na chuva: ele mostra onde o solo pode erodir.'];
 const DICA=DICAS[Math.floor(Math.random()*DICAS.length)];
 let splashOk=false;setTimeout(()=>{splashOk=true;render()},1600);
-const splash=m=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;min-height:84dvh">${island(PLOTS,250)}<div style="text-align:center"><h1>${esc(APP_NOME)}</h1><div class="m">${esc(m)}</div></div><div class="c"><h2>Dica do sítio</h2><div class="m" style="color:#2B1810">${esc(DICA)}</div></div></div>`;
+const splash=m=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;min-height:84dvh">${island(PLOTS,250)}<div style="text-align:center"><h1>${esc(APP_NOME)}</h1><div class="m">${esc(m)}</div></div><div class="c"><h2>Dica do sítio</h2><div class="m" style="color:#1F3B2B">${esc(DICA)}</div></div></div>`;
 
 /* ---------- estado ---------- */
 let lancs=[],funcs=[],pres=[],resumos=[],finPer='sem',funcSel=null,resSel=null,finOk=false,resOk=false,tanques=[],equips=[],meds=[],manejos=[],tqSel=null,rels=[],conf={},relSel=null,props=[],user=null,sid=null,sitio=null,cants=[],fers=[],itens=[],movs=[],view='home',selId=null,cat='todos',q='',unsubs=[],erroDb='';
@@ -443,7 +443,7 @@ ${lista.length?`<button class="btn w2" data-act="cfmarcar">Marcar o restante com
 function vRels(){return `<h1>Ferramentaria e Oficina</h1>${tabsOf('rels')}`+(rels.map(r=>{const n=r.mudancas.filter(m=>m.st!=='desfeita').length;return `<button class="c" data-act="relabrir" data-id="${r.id}" style="text-align:left;font:inherit;color:inherit;cursor:pointer;width:100%"><div class="r"><div class="f1"><h2>Conferência de ${fmtDT(r.em)}</h2><div class="m">${r.conferidos} de ${r.total} conferidas · por ${esc(r.por)}</div></div><span class="t ${n?'w':''}">${n} alteração(ões)</span></div></button>`}).join('')||'<div class="c"><div class="m">Nenhum relatório ainda. Faça a primeira conferência.</div></div>')}
 function vRelDet(){
   const r=rels.find(x=>x.id===relSel);if(!r)return vRels();
-  const ls=r.mudancas.map((m,i)=>`<div class="c"><div class="m" style="color:#2B1810">${descM(m,true)}${m.nota?' · '+esc(m.nota):''}</div><div class="r"><span class="t ${m.st==='desfeita'?'w':m.st==='corrigida'?'p':''}">${stM(m)}</span><div class="f1"></div>${m.st==='desfeita'?`<button class="btn w2 sm" data-act="rreaplicar" data-id="${r.id}" data-i="${i}">Reaplicar</button>`:`<button class="btn w2 sm" data-act="rdesfazer" data-id="${r.id}" data-i="${i}">Desfazer</button><button class="btn w2 sm" data-act="rcorrigir" data-id="${r.id}" data-i="${i}">Corrigir</button>`}</div></div>`).join('')||'<div class="c"><div class="m">Nenhuma alteração: tudo estava como esperado.</div></div>';
+  const ls=r.mudancas.map((m,i)=>`<div class="c"><div class="m" style="color:#1F3B2B">${descM(m,true)}${m.nota?' · '+esc(m.nota):''}</div><div class="r"><span class="t ${m.st==='desfeita'?'w':m.st==='corrigida'?'p':''}">${stM(m)}</span><div class="f1"></div>${m.st==='desfeita'?`<button class="btn w2 sm" data-act="rreaplicar" data-id="${r.id}" data-i="${i}">Reaplicar</button>`:`<button class="btn w2 sm" data-act="rdesfazer" data-id="${r.id}" data-i="${i}">Desfazer</button><button class="btn w2 sm" data-act="rcorrigir" data-id="${r.id}" data-i="${i}">Corrigir</button>`}</div></div>`).join('')||'<div class="c"><div class="m">Nenhuma alteração: tudo estava como esperado.</div></div>';
   return `${back('rels')}<h1>Relatório da conferência</h1><div class="m">${fmtDT(r.em)} · por ${esc(r.por)}</div><div class="r">${box(r.conferidos,'Conferidas')}${box(r.naoConferidos.length,'Não conferidas')}${box(r.mudancas.length,'Alterações')}</div><h2>Alterações no estoque</h2>${ls}
 ${r.obs.length?`<div class="c"><h2>Observações</h2>${r.obs.map(o=>`<div class="m">${esc(o.nome)}: ${esc(o.nota)}</div>`).join('')}</div>`:''}
 ${r.naoConferidos.length?`<div class="c"><h2>Não conferidas</h2><div class="m">${r.naoConferidos.map(esc).join(', ')}</div></div>`:''}
@@ -509,7 +509,7 @@ function alertasPx(){
 }
 function banCrit(){
   const c=alertasPx().filter(a=>a.n===3);if(!c.length)return '';
-  return `<button class="c" data-act="alertas" style="background:#FBE9E5;border-color:#E3B0A8;text-align:left;font:inherit;color:inherit;cursor:pointer"><h2>Alerta crítico</h2><div class="m" style="color:#2B1810">${esc(c[0].tit)} · ${esc(c[0].sub)}${c.length>1?' (+'+(c.length-1)+')':''}</div></button>`;
+  return `<button class="c" data-act="alertas" style="background:#FBE9E5;border-color:#E3B0A8;text-align:left;font:inherit;color:inherit;cursor:pointer"><h2>Alerta crítico</h2><div class="m" style="color:#1F3B2B">${esc(c[0].tit)} · ${esc(c[0].sub)}${c.length>1?' (+'+(c.length-1)+')':''}</div></button>`;
 }
 const gauge=(n,v,u,tag,cls)=>`<div class="c"><div class="m">${n}</div><div style="font-size:24px;font-weight:600">${v==null?'—':v}<span class="m"> ${v==null?'':u}</span></div><span class="t ${cls}" style="align-self:flex-start">${tag}</span></div>`;
 function vPeixes(){
@@ -527,12 +527,12 @@ function vTqDet(){
   const A=alertasPx().filter(a=>a.t.id===t.id),m=ultMed(t.id),hoje=d0(Date.now());
   const rh=manejos.filter(x=>x.tanqueId===t.id&&x.tipo==='racao'&&d0(x.em)===hoje),kg=rh.reduce((s,x)=>s+(x.qtd||0),0);
   const dias=t.povoamento?Math.floor((Date.now()-t.povoamento)/DAY):0,prog=t.metaPeso?Math.min(100,(t.pesoMedio||0)/t.metaPeso*100):0;
-  const eq=equips.filter(e=>e.tanqueId===t.id).map(e=>`<div class="m" style="color:#2B1810">${esc(e.nome)}: <b>${e.estado==='parado'?'parado':'ligado'}</b></div>`).join('')||'<div class="m">Nenhum equipamento ligado a este tanque.</div>';
+  const eq=equips.filter(e=>e.tanqueId===t.id).map(e=>`<div class="m" style="color:#1F3B2B">${esc(e.nome)}: <b>${e.estado==='parado'?'parado':'ligado'}</b></div>`).join('')||'<div class="m">Nenhum equipamento ligado a este tanque.</div>';
   return `${back('peixes')}<div class="r"><h1 class="f1">${esc(t.nome)}</h1><span class="t">${esc(t.especie)}</span></div>${island(big(H(t.especie,'peixe')),190)}
-${A.filter(a=>a.n>=2).map(a=>`<div class="c" style="background:#FBE9E5;border-color:#E3B0A8"><h2>${esc(a.tit)}</h2><div class="m" style="color:#2B1810">${esc(a.sub)}</div></div>`).join('')}
+${A.filter(a=>a.n>=2).map(a=>`<div class="c" style="background:#FBE9E5;border-color:#E3B0A8"><h2>${esc(a.tit)}</h2><div class="m" style="color:#1F3B2B">${esc(a.sub)}</div></div>`).join('')}
 <div class="r">${box(t.qtd,'Peixes')}${box(Math.round(t.pesoMedio||0)+' g','Peso médio')}${box(biomassa(t).toFixed(1)+' kg','Biomassa')}</div>
 <div class="c"><h2>Crescimento</h2>${t.metaPeso?`<div class="bar"><i style="width:${prog}%"></i></div><div class="m">${Math.round(prog)}% da meta de ${t.metaPeso} g</div>`:'<div class="m">Defina uma meta de peso ao cadastrar.</div>'}<div class="m">Dia ${dias} de cultivo${t.despescaPrev?' · despesca prevista '+fmt(t.despescaPrev):''}</div></div>
-<div class="c"><h2>Água</h2>${m?`<div class="m" style="color:#2B1810">${fmtDT(m.em)} · ${[m.temp!=null?m.temp+' °C':'',m.ph!=null?'pH '+m.ph:'',m.o2!=null?'O₂ '+m.o2+' mg/L':''].filter(Boolean).join(' · ')}</div>`:'<div class="m">Sem medições ainda.</div>'}</div>
+<div class="c"><h2>Água</h2>${m?`<div class="m" style="color:#1F3B2B">${fmtDT(m.em)} · ${[m.temp!=null?m.temp+' °C':'',m.ph!=null?'pH '+m.ph:'',m.o2!=null?'O₂ '+m.o2+' mg/L':''].filter(Boolean).join(' · ')}</div>`:'<div class="m">Sem medições ainda.</div>'}</div>
 <div class="c"><h2>Alimentação de hoje</h2><div class="m">${rh.length} de ${t.refeicoes||2} refeições · ${kg.toFixed(1)} kg</div></div><div class="c"><h2>Equipamentos</h2>${eq}</div>
 <div class="g"><button class="btn" data-go="agua">Água</button><button class="btn" data-go="manejo">Manejo</button><button class="btn w2" data-go="graficos">Gráficos</button><button class="btn w2" data-go="lote">Lote e custos</button></div>`}
 function vAgua(){
@@ -543,13 +543,13 @@ function vAgua(){
   return `${back('tqdet')}<h1>Qualidade da água</h1><div class="m">${esc(t.nome)} · ${esc(t.especie)}</div>
 <div class="g">${gauge('Oxigênio',o,'mg/L',tag,cl)}${gauge('Temperatura',tt,'°C',tg,tg==='Ok'||tg==='Sem dado'?'':'w')}${gauge('pH',pp,'',pg,pg==='Ok'||pg==='Sem dado'?'':'w')}${gauge('Amônia',m?.amonia,'mg/L',m?.amonia==null?'Sem dado':'Registrada','')}</div>
 <div class="c"><h2>Nova medição</h2><div class="g">${field('mo','Oxigênio (mg/L)',inp('mo','','type="number" step="any" inputmode="decimal"'))}${field('mt','Temperatura (°C)',inp('mt','','type="number" step="any" inputmode="decimal"'))}${field('mp','pH',inp('mp','','type="number" step="any" inputmode="decimal"'))}${field('ma','Amônia (mg/L)',inp('ma','','type="number" step="any" inputmode="decimal"'))}</div><button class="btn" data-act="medsalvar">Registrar medição</button></div>
-<div class="c"><h2>Últimas medições</h2>${hist.map(h=>`<div class="m" style="color:#2B1810">${fmtDT(h.em)} · ${[h.o2!=null?'O₂ '+h.o2:'',h.temp!=null?h.temp+' °C':'',h.ph!=null?'pH '+h.ph:'',h.amonia!=null?'NH₃ '+h.amonia:''].filter(Boolean).join(' · ')}</div>`).join('')||'<div class="m">Nenhuma ainda.</div>'}</div>
+<div class="c"><h2>Últimas medições</h2>${hist.map(h=>`<div class="m" style="color:#1F3B2B">${fmtDT(h.em)} · ${[h.o2!=null?'O₂ '+h.o2:'',h.temp!=null?h.temp+' °C':'',h.ph!=null?'pH '+h.ph:'',h.amonia!=null?'NH₃ '+h.amonia:''].filter(Boolean).join(' · ')}</div>`).join('')||'<div class="m">Nenhuma ainda.</div>'}</div>
 <div class="m">Faixas usadas: oxigênio aviso abaixo de ${L.o2Min} e emergência abaixo de ${L.o2Emerg} mg/L; temperatura ${L.tMin}–${L.tMax} °C; pH ${L.phMin}–${L.phMax}. Ajuste em Regras de segurança.</div>`}
 function vManejo(){
   const t=tanques.find(x=>x.id===tqSel);if(!t)return vPeixes();
   const rac=itens.filter(i=>String(i.unidade).toLowerCase()==='kg').sort((a,b)=>(b.cat==='racao')-(a.cat==='racao'));
   const nomes={racao:'Ração',biometria:'Biometria',mortalidade:'Mortalidade',despesca:'Despesca',povoamento:'Povoamento'};
-  const hist=manejos.filter(x=>x.tanqueId===t.id).slice(0,10).map(x=>`<div class="m" style="color:#2B1810">${fmtDT(x.em)} · ${nomes[x.tipo]||x.tipo} ${x.tipo==='racao'?x.qtd+' kg':x.tipo==='biometria'?x.peso+' g':x.tipo==='despesca'?x.qtd+' peixes · '+(x.kg||0)+' kg':x.qtd+' peixes'}</div>`).join('')||'<div class="m">Nada registrado ainda.</div>';
+  const hist=manejos.filter(x=>x.tanqueId===t.id).slice(0,10).map(x=>`<div class="m" style="color:#1F3B2B">${fmtDT(x.em)} · ${nomes[x.tipo]||x.tipo} ${x.tipo==='racao'?x.qtd+' kg':x.tipo==='biometria'?x.peso+' g':x.tipo==='despesca'?x.qtd+' peixes · '+(x.kg||0)+' kg':x.qtd+' peixes'}</div>`).join('')||'<div class="m">Nada registrado ainda.</div>';
   return `${back('tqdet')}<h1>Manejo</h1><div class="m">${esc(t.nome)} · ${esc(t.especie)}</div>
 <div class="c"><h2>Alimentação</h2>${field('rk','Ração oferecida (kg)',inp('rk','','type="number" min="0" step="any" inputmode="decimal"'))}${field('ri','Descontar do paiol',selH('ri',[['','Não descontar'],...rac.map(i=>[i.id,i.nome+' ('+i.qtd+' kg)'])],''))}<button class="btn" data-act="racao">Registrar arraçoamento</button></div>
 <div class="c"><h2>Biometria</h2>${field('bp','Peso médio da amostra (g)',inp('bp','','type="number" min="0" step="any" inputmode="decimal"'))}<button class="btn w2" data-act="biometria">Registrar biometria</button></div>
@@ -561,13 +561,13 @@ function chart(pts,lines){
   if(pts.length<2)return '<div class="m">Poucos dados ainda. Registre mais medições.</div>';
   const ys=pts.map(p=>p.y).concat(lines.map(l=>l[0])),mn=Math.min(...ys),mx=Math.max(...ys),pad=(mx-mn||1)*.15,lo=mn-pad,hi=mx+pad,W=322,Hh=110,x0=pts[0].x,x1=pts[pts.length-1].x;
   const sx=x=>(x-x0)/((x1-x0)||1)*W,sy=y=>Hh-(y-lo)/(hi-lo)*Hh;
-  return `<svg viewBox="0 0 ${W} ${Hh}" width="100%" role="img" aria-label="Gráfico">${lines.map(([v,c])=>`<line x1="0" x2="${W}" y1="${sy(v)}" y2="${sy(v)}" stroke="${c}" stroke-dasharray="4 4"/>`).join('')}<polyline points="${pts.map(p=>sx(p.x).toFixed(1)+','+sy(p.y).toFixed(1)).join(' ')}" fill="none" stroke="#9C7430" stroke-width="3" stroke-linejoin="round"/></svg><div class="m">mínimo ${mn} · máximo ${mx}</div>`;
+  return `<svg viewBox="0 0 ${W} ${Hh}" width="100%" role="img" aria-label="Gráfico">${lines.map(([v,c])=>`<line x1="0" x2="${W}" y1="${sy(v)}" y2="${sy(v)}" stroke="${c}" stroke-dasharray="4 4"/>`).join('')}<polyline points="${pts.map(p=>sx(p.x).toFixed(1)+','+sy(p.y).toFixed(1)).join(' ')}" fill="none" stroke="#3F7A47" stroke-width="3" stroke-linejoin="round"/></svg><div class="m">mínimo ${mn} · máximo ${mx}</div>`;
 }
 function vGraficos(){
   const t=tanques.find(x=>x.id===tqSel);if(!t)return vPeixes();
   const L=lim(),mt=meds.filter(m=>m.tanqueId===t.id&&Date.now()-m.em<7*DAY);
   const bio=manejos.filter(x=>x.tanqueId===t.id&&x.tipo==='biometria').map(x=>({x:x.em,y:x.peso})).concat(t.povoamento&&t.pesoInicial?[{x:t.povoamento,y:t.pesoInicial}]:[]).sort((a,b)=>a.x-b.x);
-  return `${back('tqdet')}<h1>Gráficos</h1><div class="m">${esc(t.nome)} · ${esc(t.especie)}</div><div class="c"><h2>Oxigênio · últimos 7 dias</h2>${chart(pontos(mt,'o2'),[[L.o2Min,'#B8893B'],[L.o2Emerg,'#B3322B']])}<div class="m">Linha dourada: aviso. Linha vermelha: emergência.</div></div><div class="c"><h2>Temperatura · últimos 7 dias</h2>${chart(pontos(mt,'temp'),[[L.tMin,'#B8893B'],[L.tMax,'#B8893B']])}</div><div class="c"><h2>Peso médio (g)</h2>${chart(bio,t.metaPeso?[[t.metaPeso,'#B8893B']]:[])}</div>`}
+  return `${back('tqdet')}<h1>Gráficos</h1><div class="m">${esc(t.nome)} · ${esc(t.especie)}</div><div class="c"><h2>Oxigênio · últimos 7 dias</h2>${chart(pontos(mt,'o2'),[[L.o2Min,'#4F8A4B'],[L.o2Emerg,'#B3322B']])}<div class="m">Linha dourada: aviso. Linha vermelha: emergência.</div></div><div class="c"><h2>Temperatura · últimos 7 dias</h2>${chart(pontos(mt,'temp'),[[L.tMin,'#4F8A4B'],[L.tMax,'#4F8A4B']])}</div><div class="c"><h2>Peso médio (g)</h2>${chart(bio,t.metaPeso?[[t.metaPeso,'#4F8A4B']]:[])}</div>`}
 function vLote(){
   const t=tanques.find(x=>x.id===tqSel);if(!t)return vPeixes();
   const mj=manejos.filter(x=>x.tanqueId===t.id),soma=(tp,c)=>mj.filter(x=>x.tipo===tp).reduce((s,x)=>s+(x[c]||0),0);
@@ -576,7 +576,7 @@ function vLote(){
   const custo=(t.custoAlevinos||0)+rac*(t.precoRacao||0)+(t.outrosCustos||0),prod=biomassa(t)+kgD;
   return `${back('tqdet')}<h1>Lote e custos</h1><div class="m">${esc(t.nome)} · ${esc(t.especie)}</div>
 <div class="r">${box(t.qtdInicial||0,'Povoados')}${box(surv==null?'—':Math.round(surv)+'%','Sobrevivência')}${box(conv==null?'—':conv.toFixed(2),'Conversão')}</div>
-<div class="c"><h2>Resumo</h2><div class="m" style="color:#2B1810">Ração consumida: ${rac.toFixed(1)} kg<br>Peixes perdidos: ${mortes}<br>Despescado: ${kgD.toFixed(1)} kg · ${fmtR(recD)}<br>Custo total: ${fmtR(custo)}<br>${prod>0?'Custo por kg produzido: '+fmtR(custo/prod):'Custo por kg: informe a produção'}</div></div>
+<div class="c"><h2>Resumo</h2><div class="m" style="color:#1F3B2B">Ração consumida: ${rac.toFixed(1)} kg<br>Peixes perdidos: ${mortes}<br>Despescado: ${kgD.toFixed(1)} kg · ${fmtR(recD)}<br>Custo total: ${fmtR(custo)}<br>${prod>0?'Custo por kg produzido: '+fmtR(custo/prod):'Custo por kg: informe a produção'}</div></div>
 <div class="c"><h2>Custos do lote</h2><div class="g">${field('c1','Alevinos (R$)',inp('c1',t.custoAlevinos||'','type="number" min="0" step="any" inputmode="decimal"'))}${field('c2','Ração (R$/kg)',inp('c2',t.precoRacao||'','type="number" min="0" step="any" inputmode="decimal"'))}${field('c3','Outros custos (R$)',inp('c3',t.outrosCustos||'','type="number" min="0" step="any" inputmode="decimal"'))}${field('c4','Preço de venda (R$/kg)',inp('c4',t.precoVenda||'','type="number" min="0" step="any" inputmode="decimal"'))}</div><button class="btn" data-act="custossalvar">Salvar custos</button>${t.precoVenda&&biomassa(t)>0?`<div class="m">Receita estimada da biomassa atual: ${fmtR(biomassa(t)*t.precoVenda)}</div>`:''}</div>
 <button class="btn w2" data-act="tqencerrar">Encerrar este lote</button>`}
 function vEquip(){
@@ -590,12 +590,12 @@ function vRegras(){
 <div class="c"><h2>Além destes</h2><div class="m">O app também avisa: aerador marcado como parado, água sem medição há mais de 24 h, tanque sem alimentação hoje e biometria atrasada (30 dias). Avisos por Telegram e notificação no celular chegam na etapa de avisos automáticos.</div></div>`}
 function vAlertas(){
   const A=alertasPx();
-  const passos='<div class="c"><h2>Se o aerador parou ou o oxigênio caiu</h2><div class="m" style="color:#2B1810">1. Ligue o aerador reserva ou o gerador<br>2. Pause a alimentação do tanque<br>3. Renove ou movimente a água<br>4. Meça o oxigênio de novo em 15 minutos</div></div>';
-  return `${back('peixes')}<h1>Alertas</h1>`+(A.length?A.map(a=>`<div class="c" style="${a.n===3?'background:#FBE9E5;border-color:#E3B0A8':''}"><div class="r">${mini(H(a.t.especie,'peixe'),40)}<div class="f1"><h2>${esc(a.tit)}</h2><div class="m" style="color:#2B1810">${esc(a.sub)}</div></div></div><div class="r">${a.tipo==='aerador'?`<button class="btn sm" data-act="eqligar" data-id="${a.e.id}">Já liguei</button>`:''}<button class="btn w2 sm" data-act="tqabrir" data-id="${a.t.id}" data-v="agua">Medir a água</button><button class="btn w2 sm" data-act="tqabrir" data-id="${a.t.id}">Ver tanque</button></div></div>`).join('')+(A.some(a=>a.n>=2)?passos:''):'<div class="c"><div class="m">Nenhum alerta no momento.</div></div>');
+  const passos='<div class="c"><h2>Se o aerador parou ou o oxigênio caiu</h2><div class="m" style="color:#1F3B2B">1. Ligue o aerador reserva ou o gerador<br>2. Pause a alimentação do tanque<br>3. Renove ou movimente a água<br>4. Meça o oxigênio de novo em 15 minutos</div></div>';
+  return `${back('peixes')}<h1>Alertas</h1>`+(A.length?A.map(a=>`<div class="c" style="${a.n===3?'background:#FBE9E5;border-color:#E3B0A8':''}"><div class="r">${mini(H(a.t.especie,'peixe'),40)}<div class="f1"><h2>${esc(a.tit)}</h2><div class="m" style="color:#1F3B2B">${esc(a.sub)}</div></div></div><div class="r">${a.tipo==='aerador'?`<button class="btn sm" data-act="eqligar" data-id="${a.e.id}">Já liguei</button>`:''}<button class="btn w2 sm" data-act="tqabrir" data-id="${a.t.id}" data-v="agua">Medir a água</button><button class="btn w2 sm" data-act="tqabrir" data-id="${a.t.id}">Ver tanque</button></div></div>`).join('')+(A.some(a=>a.n>=2)?passos:''):'<div class="c"><div class="m">Nenhum alerta no momento.</div></div>');
 }
 
 /* Perfil e propriedades */
-const avatar=s=>user.photoURL?`<img src="${esc(user.photoURL)}" alt="" referrerpolicy="no-referrer" style="width:${s}px;height:${s}px;border-radius:50%;border:1px solid #B8893B;object-fit:cover;flex:none">`:`<div class="b" style="width:${s}px;height:${s}px;border-radius:50%;background:#2B1810;color:#E3C98F;font:700 ${Math.round(s/2.4)}px Inter,sans-serif">${esc((user.displayName||'?')[0])}</div>`;
+const avatar=s=>user.photoURL?`<img src="${esc(user.photoURL)}" alt="" referrerpolicy="no-referrer" style="width:${s}px;height:${s}px;border-radius:50%;border:1px solid #4F8A4B;object-fit:cover;flex:none">`:`<div class="b" style="width:${s}px;height:${s}px;border-radius:50%;background:#1F3B2B;color:#E3C98F;font:700 ${Math.round(s/2.4)}px Inter,sans-serif">${esc((user.displayName||'?')[0])}</div>`;
 function vPerfil(){
   const dono=sitio?.donoUid===user.uid;
   return `${back('home')}<h1>Meu perfil</h1>
@@ -641,7 +641,7 @@ function serie(p){
 function barras(s){
   const mx=Math.max(...s.map(x=>x.v),0);if(!(mx>0))return '<div class="m">Sem gastos neste período.</div>';
   const W=322,Hh=100,bw=W/s.length;
-  return `<svg viewBox="0 0 ${W} ${Hh+18}" width="100%" role="img" aria-label="Gastos por período">${s.map((x,i)=>{const h=x.v/mx*Hh;return `<rect x="${(i*bw+bw*.18).toFixed(1)}" y="${(Hh-h).toFixed(1)}" width="${(bw*.64).toFixed(1)}" height="${(x.v>0?Math.max(h,2):0).toFixed(1)}" rx="3" fill="#C9A25B"/><text x="${(i*bw+bw/2).toFixed(1)}" y="${Hh+13}" text-anchor="middle" font-size="9.5" fill="#6F6155">${x.l}</text>`}).join('')}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${Hh+18}" width="100%" role="img" aria-label="Gastos por período">${s.map((x,i)=>{const h=x.v/mx*Hh;return `<rect x="${(i*bw+bw*.18).toFixed(1)}" y="${(Hh-h).toFixed(1)}" width="${(bw*.64).toFixed(1)}" height="${(x.v>0?Math.max(h,2):0).toFixed(1)}" rx="3" fill="#6E9A5A"/><text x="${(i*bw+bw/2).toFixed(1)}" y="${Hh+13}" text-anchor="middle" font-size="9.5" fill="#5E6F60">${x.l}</text>`}).join('')}</svg>`;
 }
 const barCats=(cats,tot)=>cats.length?cats.map(([k,v])=>`<div><div class="r"><span class="f1" style="font-size:13.5px">${esc(k)}</span><span style="font-size:13.5px;font-weight:600">${fmtR(v)}</span></div><div class="bar"><i style="width:${Math.max(3,v/tot*100).toFixed(0)}%"></i></div></div>`).join(''):'<div class="m">Nenhum gasto neste período.</div>';
 function vFin(){
@@ -653,7 +653,7 @@ function vFin(){
 <div class="r">${boxR(g,'Gastos')}${boxR(r,'Receitas')}${boxR(r-g,'Saldo')}</div>
 <div class="c"><h2>Gastos ${finPer==='sem'?'por dia':finPer==='mes'?'por semana':'por mês'}</h2>${barras(serie(finPer))}</div>
 <div class="c"><h2>Para onde foi o dinheiro</h2>${barCats(cats,g||1)}</div>
-<div class="c"><h2>Estatísticas</h2><div class="m" style="color:#2B1810">Média por dia: ${fmtR(g/nd)}<br>Maior gasto: ${maior?esc(maior.desc||maior.cat)+' · '+fmtR(maior.valor):'—'}<br>Categoria líder: ${cats[0]?esc(cats[0][0]):'—'}<br>${NOMEP[finPer]} anterior: ${fmtR(gp)}${vr==null?'':' · '+(vr>=0?'+':'')+vr+'% nos gastos'}<br>Lançamentos: ${L.length}</div></div>
+<div class="c"><h2>Estatísticas</h2><div class="m" style="color:#1F3B2B">Média por dia: ${fmtR(g/nd)}<br>Maior gasto: ${maior?esc(maior.desc||maior.cat)+' · '+fmtR(maior.valor):'—'}<br>Categoria líder: ${cats[0]?esc(cats[0][0]):'—'}<br>${NOMEP[finPer]} anterior: ${fmtR(gp)}${vr==null?'':' · '+(vr>=0?'+':'')+vr+'% nos gastos'}<br>Lançamentos: ${L.length}</div></div>
 <button class="btn" data-go="finnovo">+ Novo lançamento</button>
 <div class="g"><button class="btn w2" data-go="funcs">Funcionários</button><button class="btn w2" data-go="finres">Resumos semanais</button></div>
 <div><h2>Lançamentos</h2><div class="m">Reposições do paiol, alevinos e despescas entram aqui sozinhos.</div></div>${rows||'<div class="c"><div class="m">Nenhum lançamento neste período.</div></div>'}
@@ -688,7 +688,7 @@ function vFinResDet(){
   return `${back('finres')}<h1>Resumo da semana${r.parcial?' (parcial)':''}</h1><div class="m">${fmt(r.ini)} a ${fmt(addD(r.fim,-1))}</div>${island(big('moeda'),130)}
 <div class="r">${boxR(r.gastos,'Gastos')}${boxR(r.receitas,'Receitas')}${boxR(r.saldo,'Saldo')}</div>
 <div class="c"><h2>Gastos por categoria</h2>${barCats(c,r.gastos||1)}</div>
-<div class="c"><div class="m" style="color:#2B1810">Semana anterior: ${fmtR(r.anterior||0)}${vr==null?'':' · '+(vr>=0?'+':'')+vr+'% nos gastos'}<br>Lançamentos na semana: ${r.n}</div></div>
+<div class="c"><div class="m" style="color:#1F3B2B">Semana anterior: ${fmtR(r.anterior||0)}${vr==null?'':' · '+(vr>=0?'+':'')+vr+'% nos gastos'}<br>Lançamentos na semana: ${r.n}</div></div>
 <div class="g"><button class="btn" data-act="rescompart">Compartilhar</button><button class="btn w2" data-act="resbaixar">Baixar</button></div>`}
 const tentouRes=new Set();
 async function ensureResumo(){
