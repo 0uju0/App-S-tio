@@ -1,2 +1,2 @@
-# App-S-tio
+# App-Sitio
 App de gerenciamento de sitio
