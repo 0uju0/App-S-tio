@@ -51,7 +51,7 @@ nav button.on{color:#1F3B2B;font-weight:700;border-bottom-color:#4F8A4B}nav butt
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
 import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserLocalPersistence} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import {where,getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,getDoc,getDocs,increment,writeBatch,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import {arrayUnion,where,getFirestore,initializeFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,onSnapshot,addDoc,updateDoc,deleteDoc,setDoc,getDoc,getDocs,increment,writeBatch,query,orderBy,limit} from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDnFinb5lTgHk0MiZ1Lo6OorqdezcKo4Cc",
@@ -326,7 +326,7 @@ let splashOk=false;setTimeout(()=>{splashOk=true;render()},1600);
 const splash=m=>`<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;min-height:84dvh">${island(PLOTS,250)}<div style="text-align:center"><h1>${esc(APP_NOME)}</h1><div class="m">${esc(m)}</div></div><div class="c"><h2>Dica do sítio</h2><div class="m" style="color:#1F3B2B">${esc(DICA)}</div></div></div>`;
 
 /* ---------- estado ---------- */
-let lancs=[],funcs=[],pres=[],resumos=[],finPer='sem',funcSel=null,resSel=null,finOk=false,resOk=false,tanques=[],equips=[],meds=[],manejos=[],tqSel=null,rels=[],conf={},relSel=null,props=[],user=null,sid=null,sitio=null,cants=[],fers=[],itens=[],movs=[],view='home',selId=null,cat='todos',q='',unsubs=[],erroDb='';
+let convRec=[],convEnv=[],lancs=[],funcs=[],pres=[],resumos=[],finPer='sem',funcSel=null,resSel=null,finOk=false,resOk=false,tanques=[],equips=[],meds=[],manejos=[],tqSel=null,rels=[],conf={},relSel=null,props=[],user=null,sid=null,sitio=null,cants=[],fers=[],itens=[],movs=[],view='home',selId=null,cat='todos',q='',unsubs=[],erroDb='';
 let authReady=false;
 const col=n=>collection(db,'sitios',sid,n),dref=(n,id)=>doc(db,'sitios',sid,n,id);
 
@@ -366,7 +366,7 @@ function vHome(){
     const sub=a.k==='v'?(diasV(x)<0?'vencido há '+(-diasV(x))+' d':'vence '+quando(diasV(x))):`${x.qtd} ${esc(x.unidade||'un')} · mínimo ${x.min}`;
     return `<div class="c"><div class="r">${mini(g,44)}<div class="f1"><h2>${tit}</h2><div class="m">${sub}</div></div><button class="btn sm" data-act="${a.k==='f'?'ofabrir':'paabrir'}" data-id="${x.id}">Ver</button></div></div>`}).join(''):`<div class="c"><div class="m">Nenhum aviso agora. Tudo em dia.</div></div>`;
   return `<div class="r"><div class="f1"><div class="m">Olá</div><h1>${nome}</h1><button class="link" data-go="props" style="text-align:left">${esc(sitio?.nome||'Minhas propriedades')} ▾</button></div><button data-go="perfil" aria-label="Meu perfil" style="background:none;border:0;padding:0;cursor:pointer">${avatar(48)}</button></div>
-${banCrit()}${cardResumo()}<div class="c"><div class="r"><h2 class="f1">${XP_ATIVO?'Sítio em crescimento':'Sítio em preparação'}</h2><span class="t w">${XP_ATIVO?(sitio?.xp||0):0} XP</span></div><div class="bar"><i style="width:${XP_ATIVO?((sitio?.xp||0)%1000)/10:0}%"></i></div>${XP_ATIVO?'':'<div class="m">A contagem de XP começa quando o app for lançado.</div>'}</div>
+${cardConv()}${banCrit()}${cardResumo()}<div class="c"><div class="r"><h2 class="f1">${XP_ATIVO?'Sítio em crescimento':'Sítio em preparação'}</h2><span class="t w">${XP_ATIVO?(sitio?.xp||0):0} XP</span></div><div class="bar"><i style="width:${XP_ATIVO?((sitio?.xp||0)%1000)/10:0}%"></i></div>${XP_ATIVO?'':'<div class="m">A contagem de XP começa quando o app for lançado.</div>'}</div>
 <div><h2>Avisos de hoje</h2><div class="m">Ao resolver, o aviso some daqui</div></div>${av}
 <div class="g"><button class="big" data-go="hortas">${mini('tomate',30)}<div>Hortas<span>${cants.length} canteiro(s)</span></div></button><button class="big" data-go="oficina">${mini('martelo',30)}<div>Ferramentaria<span>${fers.length} item(ns)</span></div></button><button class="big" data-go="paiol">${mini('saco',30)}<div>Paiol<span>${itens.length} item(ns)</span></div></button><button class="big" data-go="peixes">${mini('peixe',30)}<div>Piscicultura<span>${tqAtivos().length} tanque(s)</span></div></button></div>
 <button class="big" data-go="fin" style="min-height:84px;flex-direction:row;align-items:center;justify-content:flex-start">${mini('moeda',30)}<div>Financeiro<span>${fmtR(somaT(lancIn(...periodo('sem')),'gasto'))} gastos na semana</span></div></button>
@@ -604,10 +604,20 @@ function vPerfil(){
 <div class="c"><h2>Dados</h2><div class="m">Baixe uma cópia de tudo da propriedade ativa.</div><button class="btn w2" data-act="exportar">Exportar dados (backup)</button></div>
 <div class="c"><h2>Conta</h2><div class="m">Login feito com a sua conta Google. Sair desconecta só este aparelho.</div><button class="btn w2" data-act="logout">Sair da conta</button></div>
 <div class="m" style="text-align:center">${esc(APP_NOME)} · versão 5</div>`}
+const cardConv=()=>convRec.map(c=>`<div class="c"><h2>Convite para ${esc(c.sitioNome||'uma propriedade')}</h2><div class="m">${esc(c.deNome||c.deEmail||'Alguém')} quer te adicionar como gestor. Você pode aceitar ou recusar.</div><div class="g"><button class="btn" data-act="convaceitar" data-id="${c.id}">Aceitar</button><button class="btn w2" data-act="convrecusar" data-id="${c.id}">Recusar</button></div></div>`).join('');
+const ST={pendente:'Aguardando resposta',aceito:'Aceito',recusado:'Recusado'};
+function vMembros(){
+  if(!sitio)return vProps();
+  const dono=sitio.donoUid===user.uid,info=sitio.membrosInfo||{},M=sitio.memberUids||[];
+  const rows=M.map(u=>{const i=info[u]||{},eu=u===user.uid,isD=u===sitio.donoUid;
+    return `<div class="c"><div class="r"><div class="f1"><h2>${esc(i.nome||(eu?(user.displayName||'Você'):isD?'Dono':'Gestor'))}${eu?' (você)':''}</h2><div class="m">${esc(i.email||'')}${i.email?' · ':''}${isD?'dono':'gestor'}</div></div>${dono&&!isD?`<button class="btn w2 sm" data-act="membroremover" data-id="${u}">Remover</button>`:''}</div></div>`}).join('');
+  const env=[...convEnv].sort((a,b)=>b.criadoEm-a.criadoEm).map(c=>`<div class="c"><div class="r"><div class="f1"><h2>${esc(c.paraEmail)}</h2><div class="m">${ST[c.status]||c.status}</div></div><button class="btn w2 sm" data-act="convcancelar" data-id="${c.id}">${c.status==='pendente'?'Cancelar':'Apagar'}</button></div></div>`).join('');
+  return `${back('props')}<h1>Membros</h1><div class="m">${esc(sitio.nome)}</div>${rows}`+
+  (dono?`<div class="c"><h2>Convidar um gestor</h2><div class="m">Digite o e-mail Google que a pessoa usa no app. Ela vê o convite ao entrar e escolhe aceitar ou recusar.</div>${inp('ce','','type="email" inputmode="email" autocapitalize="none" placeholder="email@gmail.com"')}<button class="btn" data-act="convidar">Enviar convite</button></div>${env?'<div><h2>Convites enviados</h2></div>'+env:''}`:`<button class="btn w2" data-act="sair">Sair desta propriedade</button>`)}
 function vProps(){
-  return `${back('home')}<h1>Minhas propriedades</h1><div class="m">Cada propriedade tem seus próprios canteiros, ferramentas, paiol e tanques.</div>`+
-  props.map(p=>`<div class="c"><div class="r"><div class="f1"><h2>${esc(p.nome)}</h2><div class="m">${esc(p.tipo||'Sítio')}${p.cidade?' · '+esc(p.cidade):''} · ${p.donoUid===user.uid?'dono':'membro'}</div></div>${p.id===sid?'<span class="t">Ativa</span>':''}</div>${p.id===sid?`<button class="btn w2 sm" data-act="renomear">Renomear</button>`:`<button class="btn sm" data-act="trocar" data-id="${p.id}">Abrir esta propriedade</button>`}</div>`).join('')+
-  `<button class="btn" data-act="propnovo">+ Nova propriedade</button><div class="m">Convidar outras pessoas para a mesma propriedade chega em uma próxima etapa.</div>`}
+  return `${back('home')}<h1>Minhas propriedades</h1><div class="m">Cada propriedade tem seus próprios canteiros, ferramentas, paiol e tanques.</div>${cardConv()}`+
+  props.map(p=>`<div class="c"><div class="r"><div class="f1"><h2>${esc(p.nome)}</h2><div class="m">${esc(p.tipo||'Sítio')}${p.cidade?' · '+esc(p.cidade):''} · ${p.donoUid===user.uid?'dono':'membro'}</div></div>${p.id===sid?'<span class="t">Ativa</span>':''}</div>${p.id===sid?`<div class="g"><button class="btn w2 sm" data-act="renomear">Renomear</button><button class="btn w2 sm" data-go="membros">Membros</button></div>`:`<button class="btn sm" data-act="trocar" data-id="${p.id}">Abrir esta propriedade</button>`}</div>`).join('')+
+  `<button class="btn" data-act="propnovo">+ Nova propriedade</button><div class="m">Em Membros, o dono convida outros gestores pelo e-mail Google. Cada convite pode ser aceito ou recusado.</div>`}
 function vPropNovo(){return `${back('props')}<h1>Nova propriedade</h1>${field('nome','Nome',inp('nome','','placeholder="Ex.: Fazenda Santa Luzia"'))}${field('tipo','Tipo',selH('tipo',['Sítio','Fazenda','Chácara','Outro'].map(x=>[x,x]),'Sítio'))}${field('cidade','Cidade (opcional)',inp('cidade','','placeholder="Ex.: Marechal Floriano"'))}<button class="btn" data-act="propsalvar">Criar propriedade</button>`}
 
 /* ---------- render ---------- */
@@ -704,8 +714,8 @@ function cardResumo(){
   let visto='';try{visto=localStorage.getItem('rv_'+sid)||''}catch(e){}if(visto===r.id)return '';
   return `<div class="c"><div class="r">${mini('moeda',44)}<div class="f1"><h2>Resumo da semana</h2><div class="m">${dd(r.ini)} a ${dd(addD(r.fim,-1))} · gastos ${fmtR(r.gastos)} · saldo ${fmtR(r.saldo)}</div></div><button class="btn sm" data-act="resabrir" data-id="${r.id}">Ver</button></div></div>`}
 
-const VIEWS={fin:vFin,finnovo:vFinNovo,funcs:vFuncs,funcnovo:vFuncNovo,funcdet:vFuncDet,finres:vFinRes,finresdet:vFinResDet,peixes:vPeixes,tqnovo:vTqNovo,tqdet:vTqDet,agua:vAgua,manejo:vManejo,graficos:vGraficos,lote:vLote,equip:vEquip,regras:vRegras,alertas:vAlertas,conf:vConf,rels:vRels,reldet:vRelDet,perfil:vPerfil,props:vProps,propnovo:vPropNovo,home:vHome,hortas:vHortas,novo:vNovo,detalhe:vDetalhe,oficina:vOficina,ofnovo:vOfNovo,ofdet:vOfDet,paiol:vPaiol,panovo:vPaNovo,padet:vPaDet};
-const AREA={fin:'home',finnovo:'home',funcs:'home',funcnovo:'home',funcdet:'home',finres:'home',finresdet:'home',peixes:'peixes',tqnovo:'peixes',tqdet:'peixes',agua:'peixes',manejo:'peixes',graficos:'peixes',lote:'peixes',equip:'peixes',regras:'peixes',alertas:'peixes',conf:'oficina',rels:'oficina',reldet:'oficina',perfil:'home',props:'home',propnovo:'home',home:'home',hortas:'hortas',novo:'hortas',detalhe:'hortas',oficina:'oficina',ofnovo:'oficina',ofdet:'oficina',paiol:'paiol',panovo:'paiol',padet:'paiol'};
+const VIEWS={membros:vMembros,fin:vFin,finnovo:vFinNovo,funcs:vFuncs,funcnovo:vFuncNovo,funcdet:vFuncDet,finres:vFinRes,finresdet:vFinResDet,peixes:vPeixes,tqnovo:vTqNovo,tqdet:vTqDet,agua:vAgua,manejo:vManejo,graficos:vGraficos,lote:vLote,equip:vEquip,regras:vRegras,alertas:vAlertas,conf:vConf,rels:vRels,reldet:vRelDet,perfil:vPerfil,props:vProps,propnovo:vPropNovo,home:vHome,hortas:vHortas,novo:vNovo,detalhe:vDetalhe,oficina:vOficina,ofnovo:vOfNovo,ofdet:vOfDet,paiol:vPaiol,panovo:vPaNovo,padet:vPaDet};
+const AREA={membros:'home',fin:'home',finnovo:'home',funcs:'home',funcnovo:'home',funcdet:'home',finres:'home',finresdet:'home',peixes:'peixes',tqnovo:'peixes',tqdet:'peixes',agua:'peixes',manejo:'peixes',graficos:'peixes',lote:'peixes',equip:'peixes',regras:'peixes',alertas:'peixes',conf:'oficina',rels:'oficina',reldet:'oficina',perfil:'home',props:'home',propnovo:'home',home:'home',hortas:'hortas',novo:'hortas',detalhe:'hortas',oficina:'oficina',ofnovo:'oficina',ofdet:'oficina',paiol:'paiol',panovo:'paiol',padet:'paiol'};
 let lastView=null;
 function render(){
   const app=$('#app'),nav=$('#nav'),y=lastView===view?window.scrollY:0;
@@ -748,7 +758,7 @@ document.addEventListener('click',async e=>{
     else if(a==='propsalvar'){
       const nome=val('nome').trim();if(!nome){toast('Informe o nome da propriedade');return}
       el.disabled=true;
-      const r=await addDoc(collection(db,'sitios'),{nome,tipo:val('tipo'),cidade:val('cidade').trim(),donoUid:user.uid,memberUids:[user.uid],xp:0,criadoEm:Date.now()});
+      const r=await addDoc(collection(db,'sitios'),{nome,tipo:val('tipo'),cidade:val('cidade').trim(),donoUid:user.uid,memberUids:[user.uid],membrosInfo:{[user.uid]:{nome:user.displayName||'',email:(user.email||'').toLowerCase()}},xp:0,criadoEm:Date.now()});
       await setDoc(doc(db,'users',user.uid),{sitioId:r.id},{merge:true});abrirSitio(r.id);view='home';render();toast('Propriedade criada')}
     else if(a==='trocar'){await setDoc(doc(db,'users',user.uid),{sitioId:id},{merge:true});abrirSitio(id);view='home';render();scrollTo(0,0)}
     else if(a==='renomear'){const n=(prompt('Novo nome da propriedade:',sitio?.nome||'')||'').trim();if(n)await updateDoc(doc(db,'sitios',sid),{nome:n})}
@@ -803,6 +813,33 @@ document.addEventListener('click',async e=>{
       if(Object.values(L).some(x=>isNaN(x))||L.o2Emerg>L.o2Min||L.tMin>=L.tMax||L.phMin>=L.phMax){toast('Confira os valores');return}
       await updateDoc(doc(db,'sitios',sid),{limites:L});toast('Regras salvas')}
     else if(a==='alertas'){view='alertas';render();scrollTo(0,0)}
+    /* convites e membros */
+    else if(a==='convidar'){
+      const em=val('ce').trim().toLowerCase();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){toast('Digite um e-mail válido');return}
+      if(em===(user.email||'').toLowerCase()||Object.values(sitio.membrosInfo||{}).some(i=>i.email===em)){toast('Essa pessoa já participa da propriedade');return}
+      await setDoc(doc(db,'convites',sid+'_'+em),{sitioId:sid,sitioNome:sitio.nome||'',deUid:user.uid,deNome:user.displayName||'',deEmail:(user.email||'').toLowerCase(),paraEmail:em,status:'pendente',criadoEm:Date.now()});
+      render();toast('Convite enviado. A pessoa precisa entrar no app com esse e-mail')}
+    else if(a==='convcancelar'){await deleteDoc(doc(db,'convites',id));toast('Convite removido')}
+    else if(a==='convrecusar'){await updateDoc(doc(db,'convites',id),{status:'recusado'});toast('Convite recusado')}
+    else if(a==='convaceitar'){
+      const c=convRec.find(x=>x.id===id);if(!c)return;el.disabled=true;
+      const b=writeBatch(db);
+      b.update(doc(db,'sitios',c.sitioId),{memberUids:arrayUnion(user.uid),['membrosInfo.'+user.uid]:{nome:user.displayName||'',email:(user.email||'').toLowerCase()}});
+      b.update(doc(db,'convites',c.id),{status:'aceito'});
+      await b.commit();
+      await setDoc(doc(db,'users',user.uid),{sitioId:c.sitioId},{merge:true});
+      abrirSitio(c.sitioId);view='home';render();scrollTo(0,0);toast('Você entrou em '+(c.sitioNome||'a propriedade'))}
+    else if(a==='membroremover'){
+      if(!confirm('Remover esta pessoa da propriedade? Ela perde o acesso na hora.'))return;
+      const info={...(sitio.membrosInfo||{})};delete info[id];
+      await updateDoc(doc(db,'sitios',sid),{memberUids:sitio.memberUids.filter(x=>x!==id),membrosInfo:info});toast('Pessoa removida')}
+    else if(a==='sair'){
+      if(!confirm('Sair desta propriedade? Você deixa de ver os dados dela.'))return;
+      const info={...(sitio.membrosInfo||{})};delete info[user.uid];const antigo=sid,outra=props.find(p=>p.id!==antigo);
+      await updateDoc(doc(db,'sitios',antigo),{memberUids:sitio.memberUids.filter(x=>x!==user.uid),membrosInfo:info});
+      if(outra){await setDoc(doc(db,'users',user.uid),{sitioId:outra.id},{merge:true});abrirSitio(outra.id);view='home';render()}
+      else{await setDoc(doc(db,'users',user.uid),{sitioId:null},{merge:true});location.reload()}}
     /* financeiro */
     else if(a==='finper'){finPer=id;render()}
     else if(a==='finsalvar'){
@@ -900,7 +937,7 @@ document.addEventListener('input',e=>{
 
 /* ---------- backup ---------- */
 function exportar(){
-  const dados={exportadoEm:new Date().toISOString(),sitio,canteiros:cants,ferramentas:fers,itens,movimentos:movs,conferencias:rels,tanques,equipamentos:equips,medicoes:meds,manejos,lancamentos:lancs,funcionarios:funcs,presencas:pres,resumos};
+  const dados={exportadoEm:new Date().toISOString(),sitio,canteiros:cants,ferramentas:fers,itens,movimentos:movs,conferencias:rels,tanques,equipamentos:equips,medicoes:meds,manejos,lancamentos:lancs,funcionarios:funcs,presencas:pres,resumos,convites:convEnv};
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(dados,null,1)],{type:'application/json'}));
   a.download='sitio-backup-'+hojeISO()+'.json';document.body.appendChild(a);a.click();a.remove();toast('Backup baixado');
 }
@@ -910,7 +947,7 @@ function falha(err){erroDb='Não consegui acessar o banco. Verifique se o Firest
 let dataUnsubs=[];
 const sub=(n,set,ref)=>onSnapshot(ref||col(n),s=>{set(s.docs.map(d=>({id:d.id,...d.data()})));ensureResumo();refresh()},falha);
 function abrirSitio(id){
-  dataUnsubs.forEach(f=>f());dataUnsubs=[];sid=id;sitio=null;cants=[];fers=[];itens=[];movs=[];rels=[];tanques=[];equips=[];meds=[];manejos=[];lancs=[];funcs=[];pres=[];resumos=[];finOk=false;resOk=false;holos={};
+  dataUnsubs.forEach(f=>f());dataUnsubs=[];sid=id;sitio=null;cants=[];fers=[];itens=[];movs=[];rels=[];tanques=[];equips=[];meds=[];manejos=[];lancs=[];funcs=[];pres=[];resumos=[];finOk=false;resOk=false;holos={};convEnv=[];
   dataUnsubs.push(onSnapshot(doc(db,'sitios',sid),s=>{sitio=s.data();refresh()},falha),
     sub('canteiros',a=>cants=a.sort((x,y)=>x.criadoEm-y.criadoEm)),
     sub('ferramentas',a=>fers=a),
@@ -922,22 +959,26 @@ function abrirSitio(id){
     sub('manejos',a=>manejos=a,query(col('manejos'),orderBy('em','desc'),limit(400))),
     sub('movimentos',a=>movs=a,query(col('movimentos'),orderBy('em','desc'),limit(200))),
     sub('lancamentos',a=>{lancs=a;finOk=true},query(col('lancamentos'),orderBy('em','desc'),limit(1500))),sub('funcionarios',a=>funcs=a.sort((x,y)=>x.criadoEm-y.criadoEm)),sub('presencas',a=>pres=a,query(col('presencas'),orderBy('em','desc'),limit(600))),
-    sub('resumos',a=>{resumos=a;resOk=true}));
+    sub('resumos',a=>{resumos=a;resOk=true}),
+    onSnapshot(query(collection(db,'convites'),where('deUid','==',user.uid)),s=>{convEnv=s.docs.map(d=>({id:d.id,...d.data()})).filter(c=>c.sitioId===sid);refresh()},()=>{}));
   render();
 }
 onAuthStateChanged(auth,async u=>{
   unsubs.forEach(f=>f());unsubs=[];dataUnsubs.forEach(f=>f());dataUnsubs=[];
-  user=u;authReady=true;holos={};sid=null;sitio=null;props=[];cants=[];fers=[];itens=[];movs=[];erroDb='';view='home';render();
+  user=u;authReady=true;holos={};sid=null;sitio=null;props=[];convRec=[];convEnv=[];cants=[];fers=[];itens=[];movs=[];erroDb='';view='home';render();
   if(!u)return;
   try{
     const uref=doc(db,'users',u.uid);let id=(await getDoc(uref)).data()?.sitioId;
+    /* se o sítio guardado não existe mais (ou não é acessível), cria um novo em vez de dar erro */
+    if(id){try{const t=await getDoc(doc(db,'sitios',id));if(!t.exists())id=null}catch(e){if(e&&e.code==='permission-denied')id=null;else throw e}}
     if(!id){
       /* primeira vez: limpa dados de teste antigos e cria o sítio */
       const velhos=await getDocs(collection(db,'users',u.uid,'canteiros'));await Promise.all(velhos.docs.map(d=>deleteDoc(d.ref)));
-      const r=await addDoc(collection(db,'sitios'),{nome:'Sítio Bom Jesus',donoUid:u.uid,memberUids:[u.uid],xp:0,criadoEm:Date.now()});
+      const r=await addDoc(collection(db,'sitios'),{nome:'Sítio Bom Jesus',donoUid:u.uid,memberUids:[u.uid],membrosInfo:{[u.uid]:{nome:u.displayName||'',email:(u.email||'').toLowerCase()}},xp:0,criadoEm:Date.now()});
       await setDoc(uref,{sitioId:r.id},{merge:true});id=r.id;
     }
     unsubs.push(onSnapshot(query(collection(db,'sitios'),where('memberUids','array-contains',u.uid)),s=>{props=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>a.criadoEm-b.criadoEm);refresh()},falha));
+    if(u.email)unsubs.push(onSnapshot(query(collection(db,'convites'),where('paraEmail','==',u.email.toLowerCase())),s=>{convRec=s.docs.map(d=>({id:d.id,...d.data()})).filter(c=>c.status==='pendente');refresh()},()=>{}));
     abrirSitio(id);
   }catch(err){falha(err)}
 });
